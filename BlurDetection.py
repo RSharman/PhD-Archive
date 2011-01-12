@@ -25,20 +25,19 @@ else:
 info['pictures'] = ["Leaf512.jpg", "Pansy512.jpg", "Pelican512.jpg", "Pumpkin512.jpg"]
 info['ISI'] = 0.5
 info['displayT'] = 0.5
-info['baseContrast'] = 0.1
+info['baseContrast'] = 0
 
 #Staircase Information
 info['nTrials'] = 1
 info['nReversals'] = 1
-info['stepSizes'] = [0.5, 0.5, 0.25, 0.25, 0.125, 0.125]
+info['stepSizes'] = [0.2, 0.2, 0.1, 0.1, 0.05, 0.05, 0.025, 0.025]
 info['minVal'] = 0
-info['maxVal'] = 100
-info['startVal'] = 20
+info['maxVal'] = 1
+info['startVal'] = 0.3
 info['nUp'] = 1
 info['nDown'] = 3
 
-DEBUG=True
-
+DEBUG=False
 #Clocks and Sounds
 trialClock = core.Clock()
 tick = sound.Sound('A', octave=6, secs=0.01); tick.setVolume(0.3)
@@ -59,9 +58,13 @@ fixation = visual.PatchStim(myWin, size=0.1, tex=None, mask='circle', rgb=-1)
 def drawPicture(contr, picture):
     """Function to Set Contrast"""
     screenContr = float(max([contr]))
+    print 'contr', contr, 'screenContr', screenContr
     if DEBUG == False:
         myWin.bits.setContrast(screenContr, LUTrange=0.9)
-    picture.setContrast(0.9*contr/screenContr)
+    if contr==0:
+        picture.setContrast(0)
+    else:
+        picture.setContrast(0.9*contr/screenContr)
     picture.draw()
 
 for thisPicture in info['pictures']:
@@ -107,6 +110,8 @@ for thisPicture in info['pictures']:
     for thisContrast in stairs:
         trialClock.reset()
         
+        print thisContrast
+        
         order = random.randint(1.0, 2.0)
         
         #Turn the dkl picture into an array so we can manipulate it
@@ -122,32 +127,36 @@ for thisPicture in info['pictures']:
         #Draw the picture
         
         if order==1:
+            if DEBUG==False: #Play a sound to indicate response is required
+                tick.play()
             img = visual.PatchStim(myWin, tex=rgbPicture, units='deg', sf=(1/10.0), size=10.0)
-            drawPicture(info['baseContrast']-thisContrast, img)
+            drawPicture(info['baseContrast']+thisContrast, img)
             myWin.flip()
             core.wait(info['displayT'])
             fixation.draw()
             myWin.flip()
             core.wait(info['ISI'])
             myWin.flip()
+            if DEBUG==False: #Play a sound to indicate response is required
+                tick.play()
             core.wait(info['displayT'])
         
         if order==2:
+            if DEBUG==False: #Play a sound to indicate response is required
+                tick.play()
             img = visual.PatchStim(myWin, tex=rgbPicture, units='deg', sf=(1/10.0), size=10.0)
             myWin.flip()
             core.wait(info['displayT'])
             fixation.draw()
             myWin.flip()
             core.wait(info['ISI'])
-            drawPicture(info['baseContrast']-thisContrast, img)
+            drawPicture(info['baseContrast']+thisContrast, img)
             myWin.flip()
+            if DEBUG==False: #Play a sound to indicate response is required
+                tick.play()
             core.wait(info['displayT'])
             myWin.flip()
             
-            
-        
-        if DEBUG==False: #Play a sound to indicate response is required
-           tick.play()
         
         fixation.draw()
         myWin.flip()
@@ -169,9 +178,14 @@ for thisPicture in info['pictures']:
         dispInfo='Isoluminant'
         
     if not os.path.isdir('StimDetection_%s' %info['participant']):
-        os.nkdir('StimDetection_%s' %info['participant'])
+        os.mkdir('StimDetection_%s' %info['participant'])
     fName = 'StimDetection_%s//StimDetection_%s_%s_%s_%s' %(info['participant'], info['participant'], thisPicture, dispInfo, info['dateStr'])
     stairs.saveAsPickle(fName)
     stairs.saveAsExcel(fileName=fName, sheetName='RawData', matrixOnly = False, appendFile=True)
     
+    if DEBUG == False:
+        win = visual.Window(bitsMode='fast')
+        win.bits.setContrast(1)
+        win.flip()
+   
 core.quit()
