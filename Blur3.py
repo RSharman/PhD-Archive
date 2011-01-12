@@ -1,10 +1,11 @@
 # Staircasing the chromatic blur of a natural scene to find the detection threshold - Oct 2010
 #Including contrast modulation to ensure that contrast doesn't decrease as a function of blur.
 
-from psychopy import visual, event, log, misc, colors, filters, misc, core, sound, data, gui, monitors
+from psychopy import visual, event, log, misc, colors, filters, misc, core, sound, data, gui, monitors, log
 import numpy as np
 import pylab, scipy, copy, time, os, random
 from scipy import ndimage
+from numpy.random import shuffle
 import Image
 import colorFunctions
 
@@ -31,7 +32,7 @@ info['displayT'] = 0.5
 info['baseBlur'] = 0
 
 #Staircase Information
-info['nTrials'] = 1
+info['nTrials'] = 5
 info['nReversals'] = 1
 info['stepSizes'] = [20, 20, 10, 10, 5, 5, 2.5, 2.5, 1.25, 1.25, 0.06, 0.06]
 info['minVal'] = 0
@@ -58,62 +59,78 @@ if DEBUG==False:
     conversionMatrix = myMon.getDKL_RGB(RECOMPUTE=False)
 fixation = visual.PatchStim(myWin, size=0.1, tex=None, mask='circle', rgb=-1)
 
-for thisPicture in info['pictures']:
 
+#Checking Responses
+def checkCorrect (keys):
+    for key in keys:
+        if key in ['q', 'escape']:
+            core.quit()
+        elif key in ['1', '2']:
+            if (key in ['1']) and order==1:
+                return 1 #subject perceives the first image as more blurred
+            if (key in ['2']) and order==1:
+                return 0 #subject perceives the second image as more blurred
+            if (key in ['1']) and order==2:
+                return 0
+            if (key in ['2']) and order==2:
+                return 1
+            else:
+                print "hit 1 or 2 (or q) (you hit %s)" %key
+                return None
+
+#Create multiple staircases in order interleave them
+stairs = []
+dklPictures=[]
+for thisPicture in info['pictures']:
     #Import a picture, turn into an array and change the range from 0-255 to (-1)-1
     picture=np.array(Image.open(thisPicture).transpose(Image.FLIP_TOP_BOTTOM))/127.5-1
 
     #Change the picture from RGB to DKL
-    dklPicture = colorFunctions.rgb2dklCart(picture, conversionMatrix=conversionMatrix)
+    thisDklPicture = colorFunctions.rgb2dklCart(picture, conversionMatrix=conversionMatrix)
+    thisDklPicture = np.array(thisDklPicture)
+    
+    #Create copies of the info for each staircase
+    thisInfo = copy.copy(info)
+    #Specific info for this staircase
+#    thisInfo['thisPicture'] = thisPicture
 
-    #The Staircase
-    #Set Up
-    stairs = data.StairHandler(startVal=info['startVal'], 
-                                                        nReversals=info['nReversals'],
-                                                        stepSizes=info['stepSizes'],
-                                                        stepType='lin', 
-                                                        nTrials=info['nTrials'],
-                                                        nUp=info['nUp'],
-                                                        nDown=info['nDown'],
-                                                        extraInfo=info,
-                                                        minVal=info['minVal'],
-                                                        maxVal=info['maxVal']
+    thisStair = data.StairHandler(startVal=info['startVal'], 
+                                                nReversals=info['nReversals'],
+                                                stepSizes=info['stepSizes'],
+                                                stepType='lin', 
+                                                nTrials=info['nTrials'],
+                                                nUp=info['nUp'],
+                                                nDown=info['nDown'],
+                                                extraInfo={thisPicture:thisDklPicture},
+                                                minVal=info['minVal'],
+                                                maxVal=info['maxVal']
                                                         )
+    stairs.append(thisStair)
 
-    #Checking Responses
-    def checkCorrect (keys):
-        for key in keys:
-            if key in ['q', 'escape']:
-                core.quit()
-            elif key in ['1', '2']:
-                if (key in ['1']) and order==1:
-                    return 1 #subject perceives the first image as more blurred
-                if (key in ['2']) and order==1:
-                    return 0 #subject perceives the second image as more blurred
-                if (key in ['1']) and order==2:
-                    return 0
-                if (key in ['2']) and order==2:
-                    return 1
-                else:
-                    print "hit 1 or 2 (or q) (you hit %s)" %key
-                    return None
+for trialN in range(info['nTrials']):
+    shuffle(stairs) #randomise the order
 
+    #Loop through the randomised staircases
+    for thisStair in stairs:
+        thisIntensity = thisStair.next()
+#        print 'here', thisPicture
 #For Loop to run through the trials 
 
-    for thisBlur in stairs:
+#    for thisBlur in stairs:
         trialClock.reset()
         
         order = random.randint(1.0, 2.0)
         print 'order', order
         
-        #Turn the dkl picture into an array so we can manipulate it
-        dklPicture = np.array(dklPicture)
+        # extract the picture array from the dictionary
+        for p, d in thisStair.extraInfo.iteritems():
+            dklPicture = d
+        
+#        dklPicture = np.array(dklPicture)
 
         lum = copy.copy(dklPicture[:,:,0])*info['Luminance']
         lm = copy.copy(dklPicture[:,:,1])*info['Chromaticity']
         s = copy.copy(dklPicture[:,:,2])*info['Chromaticity']
-        
-        print thisBlur
         
         sigmaLumFirst=0
         sigmaLumSecond=0
@@ -122,15 +139,15 @@ for thisPicture in info['pictures']:
         
         if info['Chromatic Blur']=='y':
             if order==1:
-                sigmaFirst += thisBlur
+                sigmaFirst += thisIntensity
             if order==2:
-                sigmaSecond += thisBlur
+                sigmaSecond += thisIntensity
             
         if info['Luminance Blur']=='y':
             if order==1:
-                sigmaLumFirst +=thisBlur
+                sigmaLumFirst +=thisIntensity
             if order==2:
-                sigmaLumSecond += thisBlur
+                sigmaLumSecond += thisIntensity
         
     #    print sigma
         
@@ -181,33 +198,41 @@ for thisPicture in info['pictures']:
             
         print 'thisResp', thisResp
         
-        stairs.addData(thisResp)
+        thisStair.addData(thisResp)
     
-    #Saving Files - Save to a different folder for each participant, then within the folder labelled by datestamp
-    #Saving a different file for each picture condition and identify the display and blur conditions
-    #Saved to xlsx and psydat
+#Saving Files - Save to a different folder for each participant, then within the folder labelled by datestamp
+#Saving a different file for each picture condition and identify the display and blur conditions
+#Saved to xlsx and psydat
 
-    print info['participant']
+print info['participant']
+
+if info['Chromaticity']==1 and info['Luminance']==1:
+    dispInfo='LumChrom'
+if info['Chromaticity']==1 and info['Luminance']==0:
+    dispInfo='Isolum'
+if info['Chromaticity']==0 and info['Luminance']==1:
+    dispInfo='Achrom'
     
-    if info['Chromaticity']==1 and info['Luminance']==1:
-        dispInfo='LumChrom'
-    if info['Chromaticity']==1 and info['Luminance']==0:
-        dispInfo='Isolum'
-    if info['Chromaticity']==0 and info['Luminance']==1:
-        dispInfo='Achrom'
-        
-    if info['Chromatic Blur']=='y' and info['Luminance Blur']=='y':
-        blurInfo='AllBlur'
-    if info['Chromatic Blur']=='y' and info['Luminance Blur']=='n':
-        blurInfo='ChromBlur'
-    if info['Chromatic Blur']=='n' and info['Luminance Blur']=='y':
-        blurInfo='LumBlur'
+if info['Chromatic Blur']=='y' and info['Luminance Blur']=='y':
+    blurInfo='AllBlur'
+if info['Chromatic Blur']=='y' and info['Luminance Blur']=='n':
+    blurInfo='ChromBlur'
+if info['Chromatic Blur']=='n' and info['Luminance Blur']=='y':
+    blurInfo='LumBlur'
 
-    if not os.path.isdir('Blur_%s' %info['participant']):
-        os.mkdir('Blur_%s' %info['participant'])
-    fName = 'Blur_%s//Blur_%s_%s_%s_%s_%s' %(info['participant'], info['participant'], thisPicture, dispInfo, blurInfo, info['dateStr'])
-    stairs.saveAsPickle(fName)
-    #stairs.saveAsText(fName)
-    stairs.saveAsExcel(fileName=fName, sheetName='RawData', matrixOnly = False, appendFile=True)
+if not os.path.isdir('Blur_%s' %info['participant']):
+    os.mkdir('Blur_%s' %info['participant'])
+#
+#log.console.setLevel(log.DEBUG)
+
+for thisStair in stairs:
+    for p, d in thisStair.extraInfo.iteritems():
+        Picture = p
+        fName = 'Blur_%s//Blur_%s_%s_%s_%s_%s' %(info['participant'], info['participant'], Picture, dispInfo, blurInfo, info['dateStr'])
+    thisStair.saveAsExcel(fileName=fName, sheetName='RawData', matrixOnly = False, appendFile=True)
+    thisStair.saveAsPickle(fName)
+
+    #    #stairs.saveAsText(fName)
+
 
 core.quit()
