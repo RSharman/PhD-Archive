@@ -56,17 +56,17 @@ if DEBUG==False:
     conversionMatrix = myMon.getDKL_RGB(RECOMPUTE=False)
 fixation = visual.PatchStim(myWin, size=0.1, tex=None, mask='circle', rgb=-1)
 
-def drawPicture(contr, picture):
-    """Function to Set Contrast"""
-    screenContr = float(max([contr]))
-    print 'contr', contr, 'screenContr', screenContr
-    if DEBUG == False:
-        myWin.bits.setContrast(screenContr, LUTrange=0.9)
-    if contr==0:
-        picture.setContrast(0)
-    else:
-        picture.setContrast(0.9*contr/screenContr)
-    picture.draw()
+#def drawPicture(contr, picture):
+#    """Function to Set Contrast"""
+#    screenContr = float(max([contr]))
+#    print 'contr', contr, 'screenContr', screenContr
+#    if DEBUG == False:
+#        myWin.bits.setContrast(screenContr, LUTrange=0.9)
+#    if contr==0:
+#        picture.setContrast(0)
+#    else:
+#        picture.setContrast(0.9*contr/screenContr)
+#    picture.draw()
 
 #Checking Responses
 def checkCorrect (keys):
@@ -105,8 +105,8 @@ for thisPicture in info['pictures']:
     
 #    print picture
     
-    print 'min orig', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(picture)))
-    print 'max orig', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(picture)))
+#    print 'min orig', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(picture)))
+#    print 'max orig', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(picture)))
 
     #Change the picture from RGB to DKL
     thisDklPicture = colorFunctions.rgb2dklCart(picture, conversionMatrix=conversionMatrix)
@@ -166,17 +166,14 @@ for trialN in range(info['nTrials']):
 #            range = (np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(rgbPicture))))-(np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture))))
 #            rgbPicture = (((rgbPicture-(np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture)))))/range)*2)+-1
         
-        print 'min rgb', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture)))
-        print 'max rgb', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(rgbPicture)))
-        
-        
-        
         #Draw the picture
         if order==1:
             if DEBUG==False: #Play a sound to indicate response is required
                 tick.play()
             img = visual.PatchStim(myWin, tex=rgbPicture, units='deg', sf=(1/10.0), size=10.0)
-            drawPicture(info['baseContrast']+thisContrast, img)
+            img.setContrast(0.1)
+            img.draw()
+#            drawPicture(info['baseContrast']+thisContrast, img)
             myWin.flip()
             core.wait(info['displayT'])
             fixation.draw()
@@ -196,7 +193,9 @@ for trialN in range(info['nTrials']):
             fixation.draw()
             myWin.flip()
             core.wait(info['ISI'])
-            drawPicture(info['baseContrast']+thisContrast, img)
+            img.setContrast(0.1)
+            img.draw()
+#            drawPicture(info['baseContrast']+thisContrast, img)
             myWin.flip()
             if DEBUG==False: #Play a sound to indicate response is required
                 tick.play()
@@ -206,6 +205,9 @@ for trialN in range(info['nTrials']):
         
         fixation.draw()
         myWin.flip()
+        
+        print 'min rgb', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture)))
+        print 'max rgb', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(rgbPicture)))
         
         #Take Participant Response
         thisResp = None
