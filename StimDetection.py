@@ -100,9 +100,11 @@ stairs = []
 dklPictures=[]
 
 for thisPicture in info['pictures']:
-
     #Import a picture, turn into an array and change the range from 0-255 to (-1)-1
     picture=np.array(Image.open(thisPicture).transpose(Image.FLIP_TOP_BOTTOM))/127.5-1
+    
+#    print picture
+    
     print 'min orig', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(picture)))
     print 'max orig', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(picture)))
 
@@ -156,11 +158,13 @@ for trialN in range(info['nTrials']):
         #change back to RGB
         rgbPicture = colorFunctions.dklCartToRGB_2d(lum, lm, s, conversionMatrix)
         
-        if info['Isoluminant']==1:
+#        if info['Isoluminant']==1:
 #            rgbmin = np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture)))
 #            rgbmax = np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(rgbPicture)))
-            range = (np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(rgbPicture))))-(np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture))))
-            rgbPicture = (((rgbPicture-(np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture)))))/range)*2)+-1
+
+#Forces the range to be -1-1 again.
+#            range = (np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(rgbPicture))))-(np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture))))
+#            rgbPicture = (((rgbPicture-(np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture)))))/range)*2)+-1
         
         print 'min rgb', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture)))
         print 'max rgb', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(rgbPicture)))
