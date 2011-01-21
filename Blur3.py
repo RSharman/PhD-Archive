@@ -1,5 +1,5 @@
 # Staircasing the chromatic blur of a natural scene to find the detection threshold - Oct 2010
-#Including contrast modulation to ensure that contrast doesn't decrease as a function of blur.
+#All final RGB values are halved to ensure that they fall within -1-1. 
 
 from psychopy import visual, event, log, misc, colors, filters, misc, core, sound, data, gui, monitors, log
 import numpy as np
@@ -34,10 +34,10 @@ info['baseBlur'] = 0
 #Staircase Information
 info['nTrials'] = 5
 info['nReversals'] = 1
-info['stepSizes'] = [20, 20, 10, 10, 5, 5, 2.5, 2.5, 1.25, 1.25, 0.06, 0.06]
+info['stepSizes'] = [8,8,4,4,2,2,1,1,0.5,0.5]
 info['minVal'] = 0
 info['maxVal'] = 100
-info['startVal'] = 20
+info['startVal'] = 16
 info['nUp'] = 1
 info['nDown'] = 3
 

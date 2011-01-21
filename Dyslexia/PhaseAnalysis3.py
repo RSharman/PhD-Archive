@@ -11,7 +11,7 @@ if not files:
     core.quit()
 
 counter = 0
-pylab.figure(figsize=(12,11))
+pylab.figure(figsize=(15,11))
 
 for thisFileName in files:
     dat=misc.fromFile(thisFileName)
@@ -74,10 +74,13 @@ for thisFileName in files:
 #        height=1
 #    width = counter/height
 #    
-    label = 'Participant', thisFileName[-19], 'Threshold', ("%.2f" %thresh)
+
+    observer = str(thisFileName[-21])+str(thisFileName[-20])+str(thisFileName[-19])
+    
+    label = 'Participant', observer, 'Threshold', ("%.2f" %thresh)
     
     
-    pylab.subplot(3, 2, counter)
+    pylab.subplot(3, 3, counter)
 
     pylab.title(label)
     pylab.plot([0.5, thresh], [0.5,0.5], 'k--')

@@ -1,4 +1,7 @@
 # Staircasing the chromatic blur of a natural scene to find the discrimination threshold - Oct 2010
+#All final RGB values are halved to ensure that they fall within -1-1. This means that images START at 50% contrast. 
+#Therefore setting the contrast to 0.5 effectively sets the contrast to 0.25
+#This means that all thresholds derived from this code need to be doubled.
 
 from psychopy import visual, event, log, misc, colors, filters, misc, core, sound, data, gui, monitors
 import numpy as np
@@ -21,7 +24,7 @@ if dlg.OK:
     misc.toFile('detParams.pickle', info)
 else:
     core.quit()
-   
+
 #Create the basic information
 info['pictures'] = ["Leaf512.jpg", "Pansy512.jpg", "Pelican512.jpg", "Pumpkin512.jpg"]
 info['ISI'] = 0.5
@@ -29,7 +32,7 @@ info['displayT'] = 0.5
 info['baseContrast'] = 0
 
 #Staircase Information
-info['nTrials'] = 1
+info['nTrials'] = 5
 info['nReversals'] = 1
 info['stepSizes'] = [0.2, 0.2, 0.1, 0.1, 0.05, 0.05, 0.025, 0.025]
 info['minVal'] = 0
@@ -104,9 +107,6 @@ for thisPicture in info['pictures']:
     picture=np.array(Image.open(thisPicture).transpose(Image.FLIP_TOP_BOTTOM))/127.5-1
     
 #    print picture
-    
-    print 'min orig', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(picture)))
-    print 'max orig', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(picture)))
 
     #Change the picture from RGB to DKL
     thisDklPicture = colorFunctions.rgb2dklCart(picture, conversionMatrix=conversionMatrix)
@@ -140,16 +140,14 @@ for trialN in range(info['nTrials']):
     #Loop to run through the trials 
         trialClock.reset()
         
-        print thisContrast
-        
         order = random.randint(1.0, 2.0)
         
         # extract the picture array from the dictionary
         for p, d in thisStair.extraInfo.iteritems():
             dklPicture = d
             
-        print 'min dkl', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(d)))
-        print 'max dkl', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(d)))
+#        print 'min dkl', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(d)))
+#        print 'max dkl', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(d)))
 
         lum = copy.copy(dklPicture[:,:,0])*info['Achromatic']
         lm = copy.copy(dklPicture[:,:,1])*info['Isoluminant']
@@ -165,7 +163,10 @@ for trialN in range(info['nTrials']):
 #Forces the range to be -1-1 again.
 #            range = (np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(rgbPicture))))-(np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture))))
 #            rgbPicture = (((rgbPicture-(np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture)))))/range)*2)+-1
-        
+
+#Halves the RGB values to ensure that all values are within -1-1
+        rgbPicture/=2
+
         print 'min rgb', np.minimum.reduce(np.minimum.reduce(np.minimum.reduce(rgbPicture)))
         print 'max rgb', np.maximum.reduce(np.maximum.reduce(np.maximum.reduce(rgbPicture)))
         
@@ -226,16 +227,16 @@ for trialN in range(info['nTrials']):
     if not os.path.isdir('StimDetection_%s' %info['participant']):
         os.mkdir('StimDetection_%s' %info['participant'])
         
-    for thisStair in stairs:
-        for p, d in thisStair.extraInfo.iteritems():
-            Picture = p
-            fName = 'StimDetection_%s//StimDetection_%s_%s_%s_%s' %(info['participant'], info['participant'], Picture, dispInfo, info['dateStr'])
-        thisStair.saveAsPickle(fName)
-        thisStair.saveAsExcel(fileName=fName, sheetName='RawData', matrixOnly = False, appendFile=True)
+for thisStair in stairs:
+    for p, d in thisStair.extraInfo.iteritems():
+        Picture = p
+        fName = 'StimDetection_%s//StimDetection_%s_%s_%s_%s' %(info['participant'], info['participant'], Picture, dispInfo, info['dateStr'])
+    thisStair.saveAsPickle(fName)
+    thisStair.saveAsExcel(fileName=fName, sheetName='RawData', matrixOnly = False, appendFile=True)
+
+if DEBUG == False:
+    myWin.bits.setContrast(1.0, LUTrange=1.0)
+    fixation.draw()
+    myWin.flip()
     
-    if DEBUG == False:
-        win = visual.Window(bitsMode='fast')
-        win.bits.setContrast(1)
-        win.flip()
-   
 core.quit()
