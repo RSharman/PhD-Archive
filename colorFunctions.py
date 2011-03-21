@@ -15,6 +15,7 @@ def dkl2rgb2D(dkl_NxNx3, conversionMatrix):
 def dklCartToRGB_2d(LUM, LM, S, conversionMatrix=None):
     """Like dkl2rgb2D except that it uses cartesian coords (LM,S,LUM) rather than
     spherical coords for DKL (elev, azim, contr)
+    NB: Due to the matrix multiplication, this may return rgb values >1 or <-1
     """
     NxNx3=list(LUM.shape)
     NxNx3.append(3)

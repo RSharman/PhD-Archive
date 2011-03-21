@@ -20,15 +20,17 @@ if not files:
 indIntensities={}
 indResponses={}
 
+
 for thisFileName in files:
     thisIndDat = misc.fromFile(thisFileName)
+    
     for imageName, array in thisIndDat.extraInfo.iteritems():
         thisImageName = imageName
         indIntensities[thisImageName]=[]
         indResponses[thisImageName]=[]
-
-        thisIntensity = thisIndDat.intensities
-        thisResponse = thisIndDat.data
+        
+        thisIntensity = thisIndDat.reversalIntensities[-10:]
+        thisResponse = thisIndDat.data[-10:]
         indIntensities[thisImageName].extend(thisIntensity)
         indResponses[thisImageName].extend(thisResponse)
         
@@ -54,20 +56,18 @@ for thisFileName in files:
         pylab.legend(loc = 'lower right')
 #        pylab.plot(combinedIndInten-100, combinedIndResp, 'ro')
 
-#        pylab.ylim([0,1])
-#        pylab.xlim([-1, 0.5])
+        pylab.ylim([0,1])
+        pylab.xlim([-1, 2.5])
 #pylab.show()
 
 
 #get the combined data from all the files
-allIntensities, allResponses, allNames = [],[],[]
+allIntensities, allResponses = [],[]
 for thisFileName in files:
     thisDat = misc.fromFile(thisFileName)
     assert isinstance(thisDat, data.StairHandler)
     allIntensities.append( thisDat.intensities )
     allResponses.append( thisDat.data )
-    for imageName, array in thisDat.extraInfo.iteritems():
-        allNames.append(imageName)
 
 #plot each staircase
 pylab.subplot(121)
@@ -95,12 +95,12 @@ jnd = upper-lower
 pylab.subplot(122)
 #pylab.plot(smoothInt-100, smoothResp, 'k-')
 #pylab.plot([thresh, thresh],[0,0.80],'k.-.'); pylab.plot([0, thresh],[0.8,0.8],'k.-.')
-pylab.title('threshold = %0.3f' %(thresh))
-pylab.title('threshold = %0.3f (%0.3f)' %(thresh, jnd))
+#pylab.title('threshold = %0.3f' %(thresh))
+#pylab.title('threshold = %0.3f (%0.3f)' %(thresh, jnd))
 #plot points
 #pylab.plot(combinedInten-100, combinedResp, 'ko')
 pylab.ylim([0.5,1])
-pylab.xlim([0, 0.25])
+pylab.xlim([0, 25])
 
 pylab.show()
     

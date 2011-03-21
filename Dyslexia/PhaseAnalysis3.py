@@ -11,7 +11,7 @@ if not files:
     core.quit()
 
 counter = 0
-pylab.figure(figsize=(15,11))
+pylab.figure(figsize=(12,10))
 
 for thisFileName in files:
     dat=misc.fromFile(thisFileName)
@@ -57,8 +57,6 @@ for thisFileName in files:
     collapsedResps.append((modMeanResps[7]+modMeanResps[16])/2)
     collapsedResps.append((modMeanResps[8]+modMeanResps[17])/2)
 
-    print collapsedResps[8]
-
     #Create the fit
     fit = data.FitWeibull(modTrials, collapsedResps, expectedMin = 0.5)
     smoothInt = pylab.arange(min(Trials), max(Trials), 0.001)
@@ -77,10 +75,12 @@ for thisFileName in files:
 
     observer = str(thisFileName[-21])+str(thisFileName[-20])+str(thisFileName[-19])
     
-    label = 'Participant', observer, 'Threshold', ("%.2f" %thresh)
+    print 'observer', observer, 'last point', collapsedResps[8]
+    
+    label = observer, 'Threshold', ("%.2f" %thresh), 'lastpoint', '%.1f' %collapsedResps[0]
     
     
-    pylab.subplot(3, 3, counter)
+    pylab.subplot(3, 2, counter)
 
     pylab.title(label)
     pylab.plot([0.5, thresh], [0.5,0.5], 'k--')
