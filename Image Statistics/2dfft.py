@@ -4,9 +4,11 @@ from psychopy import colorFunctions, core, visual, event
 from scipy import fftpack
 import scipy, Image, copy, pylab
 import numpy as np
-import radialProfile
+import radialProfile, radial_data
 
-picture = np.array(Image.open("Pansy512.jpg").transpose(Image.FLIP_TOP_BOTTOM))/127.5-1
+OrigImage = "WhiteDot.jpg"
+picture = np.array(Image.open(OrigImage).transpose(Image.FLIP_TOP_BOTTOM))/127.5-1
+
 
 dklPicture = colorFunctions.rgb2dklCart(picture, conversionMatrix=None)
 dklPicture = np.array(dklPicture)
@@ -22,73 +24,44 @@ fftS = fftpack.fft2(s)
 #fftLumAmp = fftLum.real
 #fftLumPhase = fftLum.imag
 
-F2 = fftpack.fftshift(fftLum)
+F2Lum = fftpack.fftshift(fftLum)
+F2Lm = fftpack.fftshift(fftLm)
+F2S = fftpack.fftshift(fftS)
 
 #Not sure why this is squared www.astrobetter.com/fourier-transforms-of-images-in-python/
 #Or why a log is take before plotting, from the same source
-pylab.figure(1)
-pylab.clf()
-F3 = abs(F2)**2
-pylab.imshow(np.log10(F3))
+F3Lum = abs(F2Lum)**2
+F3Lm = abs(F2Lm)**2
+F3S = abs(F2S)**2
 
-#Calculating the azimuthally average 1D power spectrum
-A1 = radialProfile.azimuthalAverage(F3)
+#Plotting kspace
+#pylab.figure(1)
+#pylab.clf()
+#pylab.imshow(np.log10(F3Lum))
+
+#Calculating the azimuthally average 1D power spectrum using radialProfile
+A1Lum = radialProfile.azimuthalAverage(F3Lum)
+A1Lm = radialProfile.azimuthalAverage(F3Lm)
+A1S = radialProfile.azimuthalAverage(F3S)
+
 pylab.figure(2)
 pylab.clf()
-pylab.semilogy(A1)
+pylab.semilogy(A1Lum, label = 'Lum')
+pylab.semilogy(A1Lm, label = 'Lm')
+pylab.semilogy(A1S, label = 'S')
+pylab.title(OrigImage)
+pylab.legend()
+pylab.xlim(0, 256)
 pylab.xlabel('Spatial Frequency')
 pylab.ylabel('Power Spectrum')
 
-
-
-
-#fftLumMag = abs(fftLum)**2
-#
-#fftLumMag = abs(fftpack.fftshift(fftLumMag))
-#fftLumMagNew = abs(fftpack.fftshift(fftpack.fft2(fftLumMag)))
-#
-#pylab.imshow(fftLumMag)
-#
-#
-#pylab.imshow(fftLumMagNew)
-#pylab.imshow(picture)
-#pylab.xlim(120,130)
-#pylab.ylim(120,130)
-#pylab.pink()
 pylab.show()
 
-#print fftLumMag[:,0]
+LumMean = np.mean(A1Lum[127:])
+LmMean = np.mean(A1Lm[127:])
+SMean = np.mean(A1S[127:])
+print LumMean
+print LmMean
+print SMean
 
-#centre=[]
-#centre2=[]
-#xrange = np.arange(75, 437)
-#for n in xrange:
-#
-#    centre.append(fftLumMag[:,n])
-#    centre2.append(centre[n,:])
-#
-#print centre2.shape
-
-
-#print np.min(fftLum)
-#print np.max(fftLum)
-
-#fftLum = (((fftLum +0.000850091991337)/259005.5678)*2)-1
-
-#fftLum = np.reshape(fftLum(512,512))
-
-#print fftLumMag
-
-#pylab.plot(fftLumMag)
-#pylab.ylim(0, 1000)
-#pylab.show()
-#
-#myWin = visual.Window(size=(1024, 768), monitor = 'testMonitor', units = 'degs',
-#                fullscr=False, allowGUI=True)
-#
-#img = visual.PatchStim(myWin, tex=fftLumMag, sf=(1/20.0), size=20.0)
-#img.draw()
-#myWin.flip()
-#
-#junk = event.waitKeys()
 
