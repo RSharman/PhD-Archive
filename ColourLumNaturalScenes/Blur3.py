@@ -26,7 +26,7 @@ else:
     core.quit()
     
 #Create the basic information
-info['pictures'] = ["Leaf512.jpg", "Pansy512.jpg", "Pelican512.jpg", "Pumpkin512.jpg"]
+info['pictures'] = ["Pumpkin512.jpg"]
 info['ISI'] = 0.5
 info['displayT'] = 0.5
 info['baseBlur'] = 0
@@ -58,7 +58,6 @@ if DEBUG==False:
     myMon=monitors.Monitor('sparrow')
     conversionMatrix = myMon.getDKL_RGB(RECOMPUTE=False)
 fixation = visual.PatchStim(myWin, size=0.1, tex=None, mask='circle', rgb=-1)
-
 
 #Checking Responses
 def checkCorrect (keys):
@@ -174,7 +173,9 @@ for trialN in range(info['nTrials']):
         imgFirst.draw()
         myWin.flip()
         core.wait(info['displayT'])
-
+        myWin.getMovieFrame()
+        myWin.saveMovieFrames('Blur.jpg')
+        
         fixation.draw()
         myWin.flip()
         core.wait(info['ISI'])
@@ -183,6 +184,8 @@ for trialN in range(info['nTrials']):
         imgSecond.draw()
         myWin.flip()
         core.wait(info['displayT'])
+#        myWin.getMovieFrame()
+#        myWin.saveMovieFrames('Blur2.jpg')
         
         if DEBUG==False: #Play a sound to indicate response is required
             tick.play()

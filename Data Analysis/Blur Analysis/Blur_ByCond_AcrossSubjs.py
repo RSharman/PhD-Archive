@@ -22,6 +22,11 @@ indResponses={}
 
 for thisFileName in files:
     thisIndDat = misc.fromFile(thisFileName)
+    
+    thisParticipant = thisFileName[-6:]
+#    
+#    print dir(thisIndDat)
+#    
     for imageName, array in thisIndDat.extraInfo.iteritems():
         thisImageName = imageName
         indIntensities[thisImageName]=[]
@@ -40,7 +45,6 @@ for thisFileName in files:
 
     #fit curve
         combinedIndInten = numpy.array(combinedIndInten)+100
-        print combinedIndInten, combinedIndResp
         fit = data.FitWeibull(combinedIndInten, combinedIndResp, guess =[105, 10], expectedMin = 0.5)
         smoothIndInt = pylab.arange(min(combinedIndInten), max(combinedIndInten), 0.001)
         smoothIndResp = fit.eval(smoothIndInt)
@@ -48,15 +52,22 @@ for thisFileName in files:
         
         print 'Threshold', Threshold
         
-        label = thisImageName + (" - %.2f" %Threshold)
+        observer = str(thisFileName[72])+str(thisFileName[73])+str(thisFileName[74])
+        
+        label = observer + (" - %.2f" %Threshold)
         
         pylab.subplot(122)
+        
+        
         pylab.plot(smoothIndInt-100, smoothIndResp, '--', label = label)
-        pylab.legend(loc = 'lower right')
+#        pylab.legend(loc = 'lower right')
 #        pylab.plot(combinedIndInten-100, combinedIndResp, 'ro')
 
         pylab.ylim([0,1])
         pylab.xlim([-1, 2.5])
+        
+        print 'last 6 reversals mean for %s = %.3f' %(observer, (scipy.average(thisIndDat.reversalIntensities[-6:])))
+        
 #pylab.show()
 
 
@@ -73,12 +84,8 @@ pylab.subplot(121)
 colors = 'brgkcmbrgkcm'
 lines, names = [],[]
 for fileN, thisStair in enumerate(allIntensities):
-    for imageName, array in thisIndDat.extraInfo.iteritems():
-        label = imageName
     #lines.extend(pylab.plot(thisStair))
-    pylab.plot(thisStair, label=label)
-pylab.legend()
-
+    pylab.plot(thisStair)
 
 #get combined data
 combinedInten, combinedResp, combinedN = \
@@ -98,12 +105,17 @@ jnd = upper-lower
 pylab.subplot(122)
 pylab.plot(smoothInt-100, smoothResp, 'k-')
 pylab.plot([thresh, thresh],[0,0.80],'k.-.'); pylab.plot([0, thresh],[0.8,0.8],'k.-.')
-pylab.title('threshold = %0.3f' %(thresh))
-pylab.title('threshold = %0.3f (%0.3f)' %(thresh, jnd))
+
+print 'Overall Threshold ', thresh
+
+#pylab.title('threshold = %0.3f' %(thresh))
+#pylab.title('threshold = %0.3f (%0.3f)' %(thresh, jnd))
 #plot points
-pylab.plot(combinedInten-100, combinedResp, 'ko')
+#pylab.plot(combinedInten-100, combinedResp, 'ko')
 pylab.ylim([0.5,1])
-pylab.xlim([0, 10])
+pylab.xlim([0, 0.5])
+
+
 
 pylab.show()
     
