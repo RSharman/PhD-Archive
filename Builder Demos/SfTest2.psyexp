@@ -1,0 +1,193 @@
+<PsychoPy2experiment version="1.65.02" encoding="utf-8">
+  <Settings>
+    <Param name="Show mouse" val="False" valType="bool" updates="None"/>
+    <Param name="Save csv file" val="False" valType="bool" updates="None"/>
+    <Param name="Monitor" val="testMonitor" valType="str" updates="None"/>
+    <Param name="color" val="$[0,0,0]" valType="str" updates="None"/>
+    <Param name="Window size (pixels)" val="[1920, 1080]" valType="code" updates="None"/>
+    <Param name="Full-screen window" val="True" valType="bool" updates="None"/>
+    <Param name="colorSpace" val="rgb" valType="str" updates="None"/>
+    <Param name="Save log file" val="True" valType="bool" updates="None"/>
+    <Param name="Experiment info" val="{'participant':'', 'session':'001', 'ori':''}" valType="code" updates="None"/>
+    <Param name="Save excel file" val="True" valType="bool" updates="None"/>
+    <Param name="Save psydat file" val="True" valType="bool" updates="None"/>
+    <Param name="logging level" val="exp" valType="code" updates="None"/>
+    <Param name="Units" val="use prefs" valType="str" updates="None"/>
+    <Param name="Show info dlg" val="True" valType="bool" updates="None"/>
+    <Param name="Saved data folder" val="" valType="code" updates="None"/>
+    <Param name="Screen" val="1" valType="num" updates="None"/>
+  </Settings>
+  <Routines>
+    <Routine name="trial">
+      <PatchComponent name="LGabor">
+        <Param name="texture resolution" val="128" valType="code" updates="constant"/>
+        <Param name="name" val="LGabor" valType="code" updates="None"/>
+        <Param name="color" val="$[1,1,1]" valType="str" updates="constant"/>
+        <Param name="image" val="sin" valType="str" updates="constant"/>
+        <Param name="colorSpace" val="rgb" valType="str" updates="constant"/>
+        <Param name="mask" val="gauss" valType="str" updates="constant"/>
+        <Param name="pos" val="[-3, 0]" valType="code" updates="constant"/>
+        <Param name="interpolate" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="1" valType="code" updates="constant"/>
+        <Param name="phase" val="0.0" valType="code" updates="constant"/>
+        <Param name="startTime" val="0.0" valType="code" updates="constant"/>
+        <Param name="ori" val="$expInfo['ori']" valType="code" updates="constant"/>
+        <Param name="units" val="deg" valType="str" updates="None"/>
+        <Param name="sf" val="$level" valType="code" updates="set every repeat"/>
+        <Param name="advancedParams"/>
+        <Param name="size" val="[3, 3]" valType="code" updates="constant"/>
+      </PatchComponent>
+      <PatchComponent name="RGabor">
+        <Param name="texture resolution" val="128" valType="code" updates="constant"/>
+        <Param name="name" val="RGabor" valType="code" updates="None"/>
+        <Param name="color" val="$[1,1,1]" valType="str" updates="constant"/>
+        <Param name="image" val="sin" valType="str" updates="constant"/>
+        <Param name="colorSpace" val="rgb" valType="str" updates="constant"/>
+        <Param name="mask" val="gauss" valType="str" updates="constant"/>
+        <Param name="pos" val="[3, 0]" valType="code" updates="constant"/>
+        <Param name="interpolate" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="1.0" valType="code" updates="constant"/>
+        <Param name="phase" val="0.0" valType="code" updates="constant"/>
+        <Param name="startTime" val="0.0" valType="code" updates="constant"/>
+        <Param name="ori" val="$expInfo['ori']" valType="code" updates="constant"/>
+        <Param name="units" val="deg" valType="str" updates="None"/>
+        <Param name="sf" val="None" valType="code" updates="constant"/>
+        <Param name="advancedParams"/>
+        <Param name="size" val="[3, 3]" valType="code" updates="constant"/>
+      </PatchComponent>
+      <PatchComponent name="fixation">
+        <Param name="texture resolution" val="128" valType="code" updates="constant"/>
+        <Param name="name" val="fixation" valType="code" updates="None"/>
+        <Param name="color" val="$[-1,-1,-1]" valType="str" updates="constant"/>
+        <Param name="image" val="none" valType="str" updates="constant"/>
+        <Param name="colorSpace" val="rgb" valType="str" updates="constant"/>
+        <Param name="mask" val="circle" valType="str" updates="constant"/>
+        <Param name="pos" val="[0, 0]" valType="code" updates="constant"/>
+        <Param name="interpolate" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="1.0" valType="code" updates="constant"/>
+        <Param name="phase" val="0.0" valType="code" updates="constant"/>
+        <Param name="startTime" val="0.0" valType="code" updates="constant"/>
+        <Param name="ori" val="0" valType="code" updates="constant"/>
+        <Param name="units" val="deg" valType="str" updates="None"/>
+        <Param name="sf" val="None" valType="code" updates="constant"/>
+        <Param name="advancedParams"/>
+        <Param name="size" val="[0.1, 0.1]" valType="code" updates="constant"/>
+      </PatchComponent>
+      <KeyboardComponent name="key_resp">
+        <Param name="storeCorrect" val="True" valType="bool" updates="constant"/>
+        <Param name="name" val="key_resp" valType="code" updates="None"/>
+        <Param name="forceEndTrial" val="True" valType="bool" updates="constant"/>
+        <Param name="correctAns" val="left" valType="str" updates="constant"/>
+        <Param name="discard previous" val="True" valType="bool" updates="constant"/>
+        <Param name="startTime" val="0.0" valType="code" updates="constant"/>
+        <Param name="allowedKeys" val="[&quot;left&quot;,&quot;right&quot;]" valType="str" updates="constant"/>
+        <Param name="duration" val="" valType="code" updates="constant"/>
+        <Param name="storeResponseTime" val="False" valType="bool" updates="constant"/>
+        <Param name="store" val="last key" valType="str" updates="constant"/>
+      </KeyboardComponent>
+    </Routine>
+    <Routine name="adaptation">
+      <PatchComponent name="LAdapt">
+        <Param name="texture resolution" val="128" valType="code" updates="constant"/>
+        <Param name="name" val="LAdapt" valType="code" updates="None"/>
+        <Param name="color" val="$[1,1,1]" valType="str" updates="constant"/>
+        <Param name="image" val="sin" valType="str" updates="constant"/>
+        <Param name="colorSpace" val="rgb" valType="str" updates="constant"/>
+        <Param name="mask" val="gauss" valType="str" updates="constant"/>
+        <Param name="pos" val="[-3, 0]" valType="code" updates="constant"/>
+        <Param name="interpolate" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="5.0" valType="code" updates="constant"/>
+        <Param name="phase" val="$random()" valType="code" updates="set every frame"/>
+        <Param name="startTime" val="0.0" valType="code" updates="constant"/>
+        <Param name="ori" val="0" valType="code" updates="constant"/>
+        <Param name="units" val="deg" valType="str" updates="None"/>
+        <Param name="sf" val="0.8" valType="code" updates="constant"/>
+        <Param name="advancedParams"/>
+        <Param name="size" val="[3.0,3.0]" valType="code" updates="constant"/>
+      </PatchComponent>
+      <PatchComponent name="RAdapt">
+        <Param name="texture resolution" val="128" valType="code" updates="constant"/>
+        <Param name="name" val="RAdapt" valType="code" updates="None"/>
+        <Param name="color" val="$[1,1,1]" valType="str" updates="constant"/>
+        <Param name="image" val="sin" valType="str" updates="constant"/>
+        <Param name="colorSpace" val="rgb" valType="str" updates="constant"/>
+        <Param name="mask" val="gauss" valType="str" updates="constant"/>
+        <Param name="pos" val="[3, 0]" valType="code" updates="constant"/>
+        <Param name="interpolate" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="5.0" valType="code" updates="constant"/>
+        <Param name="phase" val="$random()" valType="code" updates="set every frame"/>
+        <Param name="startTime" val="0.0" valType="code" updates="constant"/>
+        <Param name="ori" val="0" valType="code" updates="constant"/>
+        <Param name="units" val="deg" valType="str" updates="None"/>
+        <Param name="sf" val="1.0" valType="code" updates="constant"/>
+        <Param name="advancedParams"/>
+        <Param name="size" val="[3, 3]" valType="code" updates="constant"/>
+      </PatchComponent>
+      <PatchComponent name="Afixation">
+        <Param name="texture resolution" val="128" valType="code" updates="constant"/>
+        <Param name="name" val="Afixation" valType="code" updates="None"/>
+        <Param name="color" val="$[-1,-1,-1]" valType="str" updates="constant"/>
+        <Param name="image" val="none" valType="str" updates="constant"/>
+        <Param name="colorSpace" val="rgb" valType="str" updates="constant"/>
+        <Param name="mask" val="circle" valType="str" updates="constant"/>
+        <Param name="pos" val="[0, 0]" valType="code" updates="constant"/>
+        <Param name="interpolate" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="5.0" valType="code" updates="constant"/>
+        <Param name="phase" val="0.0" valType="code" updates="constant"/>
+        <Param name="startTime" val="0.0" valType="code" updates="constant"/>
+        <Param name="ori" val="0" valType="code" updates="constant"/>
+        <Param name="units" val="deg" valType="str" updates="None"/>
+        <Param name="sf" val="None" valType="code" updates="constant"/>
+        <Param name="advancedParams"/>
+        <Param name="size" val="[0.1, 0.1]" valType="code" updates="constant"/>
+      </PatchComponent>
+    </Routine>
+    <Routine name="Instr">
+      <TextComponent name="text">
+        <Param name="name" val="text" valType="code" updates="None"/>
+        <Param name="color" val="white" valType="str" updates="constant"/>
+        <Param name="text" val="Press left or right to indicate the highest frequency patch" valType="str" updates="constant"/>
+        <Param name="colorSpace" val="rgb" valType="str" updates="constant"/>
+        <Param name="pos" val="[0, 0]" valType="code" updates="constant"/>
+        <Param name="duration" val="" valType="code" updates="constant"/>
+        <Param name="letterHeight" val="0.1" valType="code" updates="constant"/>
+        <Param name="startTime" val="0.0" valType="code" updates="constant"/>
+        <Param name="ori" val="0" valType="code" updates="constant"/>
+        <Param name="units" val="window units" valType="str" updates="None"/>
+        <Param name="font" val="Arial" valType="str" updates="constant"/>
+      </TextComponent>
+      <KeyboardComponent name="key_resp_2">
+        <Param name="storeCorrect" val="False" valType="bool" updates="constant"/>
+        <Param name="name" val="key_resp_2" valType="code" updates="None"/>
+        <Param name="forceEndTrial" val="True" valType="bool" updates="constant"/>
+        <Param name="correctAns" val="" valType="str" updates="constant"/>
+        <Param name="discard previous" val="True" valType="bool" updates="constant"/>
+        <Param name="startTime" val="0.0" valType="code" updates="constant"/>
+        <Param name="allowedKeys" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="" valType="code" updates="constant"/>
+        <Param name="storeResponseTime" val="True" valType="bool" updates="constant"/>
+        <Param name="store" val="last key" valType="str" updates="constant"/>
+      </KeyboardComponent>
+    </Routine>
+  </Routines>
+  <Flow>
+    <Routine name="Instr"/>
+    <Routine name="adaptation"/>
+    <LoopInitiator loopType="StairHandler" name="stairs">
+      <Param name="endPoints" val="[0, 1]" valType="num" updates="None"/>
+      <Param name="name" val="stairs" valType="code" updates="None"/>
+      <Param name="min value" val="0" valType="num" updates="None"/>
+      <Param name="N reversals" val="0" valType="code" updates="None"/>
+      <Param name="loopType" val="staircase" valType="str" updates="None"/>
+      <Param name="nReps" val="1" valType="code" updates="None"/>
+      <Param name="start value" val="0.5" valType="num" updates="None"/>
+      <Param name="N up" val="1" valType="code" updates="None"/>
+      <Param name="max value" val="1" valType="num" updates="None"/>
+      <Param name="N down" val="3" valType="code" updates="None"/>
+      <Param name="step type" val="log" valType="str" updates="None"/>
+      <Param name="step sizes" val="[0.8,0.8,0.4,0.4,0.2]" valType="num" updates="None"/>
+    </LoopInitiator>
+    <Routine name="trial"/>
+    <LoopTerminator name="stairs"/>
+  </Flow>
+</PsychoPy2experiment>

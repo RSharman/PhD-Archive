@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This experiment was created using PsychoPy2 Experiment Builder (v1.64.00), May 24, 2011, at 16:33
+This experiment was created using PsychoPy2 Experiment Builder (v1.64.00), June 29, 2011, at 17:28
 If you publish work using this script please cite the relevant PsychoPy publications
   Peirce, JW (2007) PsychoPy - Psychophysics software in Python. Journal of Neuroscience Methods, 162(1-2), 8-13.
   Peirce, JW (2009) Generating stimuli for neuroscience using PsychoPy. Frontiers in Neuroinformatics, 2:10. doi: 10.3389/neuro.11.010.2008
@@ -12,11 +12,11 @@ import os #handy system and path functions
 from psychopy import core, data, event, visual, gui
 import psychopy.log #import like this so it doesn't interfere with numpy.log
 
-#User-defined variables = [u'Instr', 'Instructions', u'fixation', u'gaborL', u'gaborR', 'key_resp', u'key_resp_2', 'trial', u'trials']
+#User-defined variables = ['Instr', 'Instructions', 'fixation', 'gaborL', 'gaborR', 'key_resp', 'key_resp_2', 'trial', 'trials']
 known_name_collisions = None  #(collisions are bad)
 
 #store info about the experiment
-expName='SfTest'#from the Builder filename that created this script
+expName='None'#from the Builder filename that created this script
 expInfo={'participant':'', 'session':'001'}
 dlg=gui.DlgFromDict(dictionary=expInfo,title=expName)
 if dlg.OK==False: core.quit() #user pressed cancel
@@ -36,31 +36,32 @@ win = visual.Window(size=[1024, 768], fullscr=True, screen=0, allowGUI=False, al
 #Initialise components for routine:Instructions
 InstructionsClock=core.Clock()
 Instr=visual.TextStim(win=win, ori=0,
-    text=u'Press left to indicate the variable with the highest spatial frequency.\nPress any key when ready',
-    font=u'Arial',
-    units=u'deg', pos=[0, 0], height=0.1,
-    color=u'white', colorSpace=u'rgb')
+    text='Press left to indicate the variable with the highest spatial frequency.\nPress any key when ready',
+    font='Arial',
+    units='deg', pos=[0, 0], height=0.1,
+    color='white', colorSpace='rgb')
 
 #set up handler to look after randomisation of trials etc
 trials=data.StairHandler(startVal=0.5, extraInfo=expInfo,
-    stepSizes=asarray([0.8,0.8,0.4,0.4,0.2]), stepType=u'log',
+    stepSizes=asarray([0.8,0.8,0.4,0.4,0.2]), stepType='log',
     nReversals=0, nTrials=5, 
-    nUp=1, nDown=1)
+    nUp=1, nDown=1,
+    originPath=u'C:\\Documents and Settings\\lpxrs\\My Documents\\Code\\Experiments\\Builder Demos\\SfTest.psyexp')
 level=thisTrial=0.5#initialise some vals
 
 #Initialise components for routine:trial
 trialClock=core.Clock()
-gaborL=visual.PatchStim(win=win, tex=u'sin', mask=u'Gauss',
+gaborL=visual.PatchStim(win=win, tex='sin', mask='Gauss',
     ori=0, pos=[-3, 0], size=[0.5, 0.5], sf=0.1+level, phase=0.0,
-    color=[1,1,1], colorSpace=u'rgb',
+    color=[1,1,1], colorSpace='rgb',
     texRes=128, interpolate=False)
-gaborR=visual.PatchStim(win=win, tex=u'sin', mask=u'Gauss',
+gaborR=visual.PatchStim(win=win, tex='sin', mask='Gauss',
     ori=0, pos=[3, 0], size=[0.5, 0.5], sf=0.9-level, phase=0.0,
-    color=[1,1,1], colorSpace=u'rgb',
+    color=[1,1,1], colorSpace='rgb',
     texRes=128, interpolate=False)
-fixation=visual.PatchStim(win=win, tex=u'None', mask=u'None',
+fixation=visual.PatchStim(win=win, tex='None', mask='None',
     ori=0, pos=[0, 0], size=[0.5, 0.5], sf=None, phase=0.0,
-    color=[1,1,1], colorSpace=u'rgb',
+    color=[1,1,1], colorSpace='rgb',
     texRes=128, interpolate=False)
 
 #update component parameters for each repeat
@@ -111,11 +112,11 @@ for thisTrial in trials:
         if (0 <= t < (0+1.5)):
             fixation.draw()
         if (0.5 <= t < (0.5+2)):
-            theseKeys = event.getKeys(keyList=u'["left","right"]')
+            theseKeys = event.getKeys(keyList='["left","right"]')
             if len(theseKeys)>0:#at least one key was pressed
                 key_resp_2.keys=theseKeys[-1]#just the last key pressed
                 #was this 'correct'?
-                if (key_resp_2.keys==str(u'left')): key_resp_2.corr=1
+                if (key_resp_2.keys==str('left')): key_resp_2.corr=1
                 else: key_resp_2.corr=0
                 #abort routine on response
                 continueTrial=False

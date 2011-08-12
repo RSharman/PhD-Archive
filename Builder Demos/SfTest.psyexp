@@ -28,13 +28,13 @@
         <Param name="mask" val="Gauss" valType="str" updates="constant"/>
         <Param name="pos" val="[-3, 0]" valType="code" updates="constant"/>
         <Param name="interpolate" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="1.0" valType="code" updates="constant"/>
         <Param name="phase" val="0.0" valType="code" updates="constant"/>
-        <Param name="advancedParams"/>
         <Param name="startTime" val="0.5" valType="code" updates="constant"/>
         <Param name="ori" val="0" valType="code" updates="constant"/>
         <Param name="units" val="window units" valType="str" updates="None"/>
         <Param name="sf" val="0.1+level" valType="code" updates="constant"/>
-        <Param name="duration" val="1.0" valType="code" updates="constant"/>
+        <Param name="advancedParams"/>
         <Param name="size" val="[0.5, 0.5]" valType="code" updates="constant"/>
       </PatchComponent>
       <PatchComponent name="gaborR">
@@ -46,13 +46,13 @@
         <Param name="mask" val="Gauss" valType="str" updates="constant"/>
         <Param name="pos" val="[3, 0]" valType="code" updates="constant"/>
         <Param name="interpolate" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="1.0" valType="code" updates="constant"/>
         <Param name="phase" val="0.0" valType="code" updates="constant"/>
-        <Param name="advancedParams"/>
         <Param name="startTime" val="0.5" valType="code" updates="constant"/>
         <Param name="ori" val="0" valType="code" updates="constant"/>
         <Param name="units" val="window units" valType="str" updates="None"/>
         <Param name="sf" val="0.9-level" valType="code" updates="constant"/>
-        <Param name="duration" val="1.0" valType="code" updates="constant"/>
+        <Param name="advancedParams"/>
         <Param name="size" val="[0.5, 0.5]" valType="code" updates="constant"/>
       </PatchComponent>
       <PatchComponent name="fixation">
@@ -64,13 +64,13 @@
         <Param name="mask" val="None" valType="str" updates="constant"/>
         <Param name="pos" val="[0, 0]" valType="code" updates="constant"/>
         <Param name="interpolate" val="" valType="str" updates="constant"/>
+        <Param name="duration" val="1.5" valType="code" updates="constant"/>
         <Param name="phase" val="0.0" valType="code" updates="constant"/>
-        <Param name="advancedParams"/>
         <Param name="startTime" val="0" valType="code" updates="constant"/>
         <Param name="ori" val="0" valType="code" updates="constant"/>
         <Param name="units" val="window units" valType="str" updates="None"/>
         <Param name="sf" val="None" valType="code" updates="constant"/>
-        <Param name="duration" val="1.5" valType="code" updates="constant"/>
+        <Param name="advancedParams"/>
         <Param name="size" val="[0.5, 0.5]" valType="code" updates="constant"/>
       </PatchComponent>
       <KeyboardComponent name="key_resp_2">
