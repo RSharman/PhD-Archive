@@ -1,10 +1,39 @@
-from psychopy import visual, event, log, misc, colors, filters
+from psychopy import visual, event, log, misc, colors, filters, monitors
 import numpy as np
 #win = visual.Window([512,100], monitor='testMonitor')
+from matplotlib import use
+use('WXAgg')
 import pylab, random, copy
 import matplotlib.image as mpimg
+from scipy import ndimage
+
+DEBUG=True
+nElements = 800
+elementSize = 0.25
+opacity = 0.25
+gap = 0.1
+blur = 0.2
+
+if DEBUG==True:
+    monitor = 'testMonitor'
+    bitsMode = None
+    myMon = monitors.Monitor('testMonitor')
+    conversionMatrix = None
+    
+if DEBUG==False:
+    monitor = 'heron'
+    bitsMode = 'Fast'
+    myMon=monitors.Monitor('heron')
+    conversionMatrix = myMon.getDKL_RGB(RECOMPUTE=False)
 
 
+def makeFilteredNoise(res, radius, shape='gauss'):
+    noise = np.random.random([res, res])
+    kernel = filters.makeMask(res, shape='gauss', radius=radius)
+    filteredNoise = filters.conv2d(kernel, noise)
+    filteredNoise = ((filteredNoise-filteredNoise.min())/(filteredNoise.max()-filteredNoise.min())*2-1)
+    return filteredNoise
+    
 def dkl2rgb2D(dkl_NxNx3, conversionMatrix):
     """convert a 2D (image) of DKL colours to RGB space"""
     origShape = dkl_NxNx3.shape#remember for later
@@ -70,96 +99,55 @@ def makeEdgeMatrix(width, center, size=512):
 def gammaCorrect(texture, gamma=2.2):
     return (((texture+1)/2.0)**(1.0/gamma))*2-1
     
+
+
 #these work OK
-lum = makeEdgeGauss(width=0.05,center=0.5)*0.1
-lm= makeEdgeGauss(width=0.1,center=0.55)*0.3
+lum = makeEdgeGauss(width=blur,center=0.5)*0.3
+lm= makeEdgeGauss(width=blur,center=(0.5+gap))*0.3
 #lum = makeEdgeMatrix(width=0.04,center=0.56)*0.1
 #lm= makeEdgeMatrix(width=0.04,center=0.50)*0.3
 s=makeEdgeGauss(width=0.2,center=0.5)*0.0
 tex=dklCartToRGB_2d(LUM=lum, LM=lm, S=s)
 
-noiseValues=[]
-for n in range(262144):
-    temp = random.random()
-    noiseValues.append(temp)
 
-#noise = np.array(noise[0:127], noise[128:255])
-noise = np.array(noiseValues).reshape(512,512)
+noise1 = makeFilteredNoise(512, radius=0.05)*0.1
+lum = lum+noise1
+noise2 = makeFilteredNoise(res=512, radius=0.05)*0.5
+lm += noise2
+
+
+lumEdge=dklCartToRGB_2d(LUM=lum, LM=lm*0, S=s*0, conversionMatrix = conversionMatrix)
+rgEdge = dklCartToRGB_2d(LUM=lum*0, LM=lm, S=s*0, conversionMatrix = conversionMatrix)
+combEdge = dklCartToRGB_2d(LUM=lum, LM=lm, S=s*0, conversionMatrix = conversionMatrix)
+
+ori = []
+for n in range(nElements):
+    temp = random.randint(0,360)
+    ori.append(temp)
+
+
+
+myWin = visual.Window(size = (800,600), monitor = monitor, bitsMode = bitsMode)
+
+combo = visual.PatchStim(myWin, tex = combEdge, size = 10.0, units = 'deg', sf=(1/10.0))
+noise3 = visual.PatchStim(myWin, tex = noise1, size = 10.0, units = 'deg', sf=(1/10.0))
+noise4 = visual.PatchStim(myWin, tex = noise2, size = 10.0, units = 'deg', sf=(1/10.0))
+
+
+lum5 = visual.PatchStim(myWin, tex = lumEdge, size = 10.0, units = 'deg', sf=(1/10.0))
+
+rg4 = visual.PatchStim(myWin, tex = rgEdge, size = 10.0, units = 'deg', sf=(1/10.0))
 #
-#noise1 = copy.copy(noise)
-#noise2 = np.resize(noise, (512, 512))
-#
-#
-#noise2 = noise1.resize(512,512)#, interpolation = 'bicubic')
-#noise2 = np.array(noise2)
+#lum5.draw()
+rg4.draw()
 
-#noise = np.array([[noiseValues]*16 for x in xrange(16)])
-#noise.resize(512,512)
+#noise3.draw()
+#noise4.draw()
 
-#print noise
-
-lumEdge=dklCartToRGB_2d(LUM=lum, LM=lm*0, S=s*0)
-rgEdge = dklCartToRGB_2d(LUM=lum*0, LM=lm, S=s*0)
-combEdge = dklCartToRGB_2d(LUM=lum, LM=lm, S=s*0)
-
-
-
-subplots=True
-if subplots: 
-    fig = pylab.figure(figsize=[6,9])
-    pylab.subplot(311)
-    pylab.imshow(rgEdge/2.0+0.5)
-    pylab.axis('off')
-    pylab.subplot(312)
-    pylab.imshow(combEdge/2.0+0.5)
-    pylab.imshow(noise, alpha = 0.5)
-    pylab.axis('off')
-    
-    pylab.subplot(313)
-    pylab.imshow(lumEdge/2.0+0.5, alpha = 1.0)
-    
-#    ax1 = pylab.subplot(313)
-#    ax1.imshow(lumEdge/2.0+0.5, alpha = 1.0)
-#    ax1.set_xlim(0,512)
-#    ax1.set_ylim(0,512)
-#    ax2 = ax1.twinx()
-#    ax2 = ax1.twiny()
-#    ax2.set_xlim(0,16)
-#    ax2.set_ylim(0,16)
-#    ax2.imshow(noise, alpha = 0.5, cmap='gray')
-    
-    pylab.axis('off')
-#    pylab.show()
-else:
-    pylab.figure(figsize=[2,1])
-    pylab.imshow(rgEdge[0:200,:]/2.0+0.5)
-    pylab.text(5,55, '(A) Chromatic', color='w')#('Chromatic boundary only')
-    pylab.axis('off')
-    pylab.savefig('pics/edgeRG.png', dpi=400)
-    pylab.figure(figsize=[2,1])
-    pylab.imshow(combEdge[0:200,:]/2.0+0.5)
-    pylab.text(5,55, '(B) Combined', color='w')
-    pylab.axis('off')
-    pylab.savefig('pics/edgeComb.png', dpi=400)
-    pylab.figure(figsize=[2,1])
-    pylab.imshow(lumEdge[0:200,:]/2.0+0.5)
-    pylab.text(5,55, '(C) Luminance', color='w')#('Chromatic boundary only')
-    pylab.axis('off')
-    pylab.savefig('pics/edgeLum.png', dpi=400)
-    
-    
-
-myWin = visual.Window(size = (800,600), monitor = 'testMonitor')
-noise5 = visual.ElementArrayStim(myWin, units = 'deg', fieldSize = (5.0,5.0), fieldShape = 'sqr', opacities = 0.25, nElements = 300,
-                elementTex='None', elementMask='None', sizes = 0.25, rgbs = -0.25)
-noise6 = visual.ElementArrayStim(myWin, units = 'deg', fieldSize = (5.0,5.0), fieldShape = 'sqr', opacities = 0.25, nElements = 300,
-                elementTex='None', elementMask='None', sizes = 0.25, rgbs = 0.25)
-
-combo = visual.PatchStim(myWin, tex = combEdge, size = 5.0, units = 'deg', sf=(1/5.0))
-
-combo.draw()
-#noise5.draw()
-#noise6.draw()
+#combo.draw()
 myWin.flip()
+
+#myWin.getMovieFrame()
+#myWin.saveMovieFrames('test.jpg')
 
 junk = event.waitKeys()
