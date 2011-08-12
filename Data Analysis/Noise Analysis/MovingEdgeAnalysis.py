@@ -32,8 +32,8 @@ channels = []
 
 for n in range(len(extraInfo)):
     temp = extraInfo[n]
-    positions.append(temp['lumEdgePos']*10)
-    print 'edge', temp['lumEdgePos']*10
+    positions.append(temp['lumEdgePos'])
+    print 'edge', temp['lumEdgePos']
     channels.append(temp['Channel'])
 #    print 'last 6 reversals mean = %.3f' %(scipy.average(thisDat.reversalIntensities[-6:]))
 #    print 'last 6 reversals mean = %.3f' %(scipy.average(thisDat.reversalIntensities[-6:])-(temp['lumEdgePos']*10))
@@ -76,23 +76,30 @@ combinedInten = pylab.array(combinedInten)+100
 fit = data.FitWeibull(combinedInten, combinedResp, sems=1.0, guess=(100,100), expectedMin=0.0)
 smoothInt = pylab.arange(min(combinedInten), max(combinedInten), 0.001)
 
+fit2 = data.FitWeibull(combinedInten, combinedResp, sems=1.0/sem, guess=(100,100), expectedMin=0.0)
+smoothResp2 = fit2.eval(smoothInt)
+
 smoothResp = fit.eval(smoothInt)
 thresh = fit.inverse(0.5)-100
 lower = fit.inverse(0.25)-100
 upper = fit.inverse(0.75)-100
 jnd = upper-lower
-print 'thresh', thresh, 'jnd', jnd
-print 'pse, jnd', fit.params[0]-100, fit.params[1]
+#print 'pse', thresh, 'jnd', jnd
+#print 'alpha, beta', fit.params[0]-100, fit.params[1]
 
-fit2 = data.FitWeibull(combinedInten, combinedResp, sems=1.0/sem, guess=(100,100), expectedMin=0.0)
-smoothResp2 = fit2.eval(smoothInt)
+threshComb = fit2.inverse(0.5)-100
+lower2 = fit2.inverse(0.25)-100
+upper2 = fit2.inverse(0.75)-100
+jnd2 = upper2-lower2
+print '1/combN pse', threshComb, 'jnd', jnd2
+print '1/combN alpha, beta', fit2.params[0]-100, fit2.params[1]
 
 #plot curve
 pylab.subplot(122)
 pylab.plot(smoothInt-100, smoothResp, 'k-')
 pylab.plot(smoothInt-100, smoothResp2, 'k--')
 pylab.plot([thresh, thresh],[0,0.5],'k--'); pylab.plot([0, thresh],[0.5,0.5],'k--')
-pylab.title('pse = %0.3f' %(thresh))
+pylab.title('pse = %0.3f' %(threshComb))
 
 
 

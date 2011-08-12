@@ -100,6 +100,7 @@ thresh = fit.inverse(0.80)-100
 lower = fit.inverse(0.625)
 upper = fit.inverse(0.875)
 jnd = upper-lower
+print 'pse, jnd', fit.params-100
 
 #plot curve
 pylab.subplot(122)
@@ -113,7 +114,7 @@ print 'Overall Threshold ', thresh
 #plot points
 #pylab.plot(combinedInten-100, combinedResp, 'ko')
 pylab.ylim([0.5,1])
-pylab.xlim([0, 0.5])
+pylab.xlim([0, 20])
 
 
 

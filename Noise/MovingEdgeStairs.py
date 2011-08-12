@@ -11,7 +11,7 @@
 
 from psychopy import visual, event, filters, monitors, data, sound, gui, misc, core
 import numpy as np
-import random, time, os
+import random, time, os, cPickle
 
 DEBUG=True
 
@@ -24,7 +24,8 @@ except:
                 'Blur' : 0.1,
                 'Gap' : 0,
                 'Noise Size' : 0.1,
-                'Noise Contrast' : 0.2}
+                'Noise Contrast' : 0.2,
+                'Edge Contrast' : 0.3}
 info['dateStr']=time.strftime("%b%d_%H%M", time.localtime())
 dlg = gui.DlgFromDict(info, title='Synthetic Edge Experiment', fixed=['dateStr'])
 if dlg.OK:
@@ -35,11 +36,11 @@ else:
 #Staircase Information
 info['nTrials'] = 50
 info['nReversals'] = 1
-info['stepSizes'] = [0.9888, 0.9888, 0.2472, 0.0618, 0.01545]#[0.25,0.125,0.125,0.06,0.06,0.03,0.03,0.015,0.015, 0.0075] 
+info['stepSizes'] = [0.09888, 0.09888, 0.02472, 0.00618, 0.001545]#[0.25,0.125,0.125,0.06,0.06,0.03,0.03,0.015,0.015, 0.0075] 
 #[0.25,0.25,0.125,0.125,0.06,0.06,0.03,0.03,0.015,0.015]
-info['minVal'] = 0
-info['maxVal'] = 10
-info['startVal'] = 5
+info['minVal'] = 0.2
+info['maxVal'] = 0.8
+info['startVal'] = 0.5
 info['nUp'] = 1
 info['nDown'] = 1
 
@@ -65,12 +66,12 @@ if DEBUG==False:
 info['displayT'] = 0.3
 
 #Function to Create Filtered White Noise
-def makeFilteredNoise(res, radius, shape='gauss'):
-    noise = np.random.random([res, res])
-    kernel = filters.makeMask(res, shape='gauss', radius=radius)
-    filteredNoise = filters.conv2d(kernel, noise)
-    filteredNoise = ((filteredNoise-filteredNoise.min())/(filteredNoise.max()-filteredNoise.min())*2-1)
-    return filteredNoise
+#def makeFilteredNoise(res, radius, shape='gauss'):
+#    noise = np.random.random([res, res])
+#    kernel = filters.makeMask(res, shape='gauss', radius=radius)
+#    filteredNoise = filters.conv2d(kernel, noise)
+#    filteredNoise = ((filteredNoise-filteredNoise.min())/(filteredNoise.max()-filteredNoise.min())*2-1)
+#    return filteredNoise
 
 #Checking Responses
 def checkCorrect (keys):
@@ -78,9 +79,9 @@ def checkCorrect (keys):
         if key in ['q', 'escape']:
             core.quit()
         elif key in ['left', 'right']:
-            if (key in ['right']):
-                return 1 #subject perceives the line to be to the right
             if (key in ['left']):
+                return 1 #subject perceives the line to be to the right
+            if (key in ['right']):
                 return 0 #subject perceives the line to be to the left
             else:
                 print "hit left or right (or q) (you hit %s)" %key
@@ -100,6 +101,18 @@ stairs = data.StairHandler(startVal=info['startVal'],
                                                     maxVal=info['maxVal']
                                                     )
 
+if info['Edge Contrast'] + info['Noise Contrast'] >1.0:
+    print 'Edge Contrast + Noise Contrast > 1.0, please reduce one of these values'
+    core.quit()
+
+#noise=[]
+#for n in range(100):
+#    temp = makeFilteredNoise(512, radius=info['Noise Size'])
+#    noise.append(temp)
+
+pkl_file = open('noise02.pickle', 'rb')
+noise = cPickle.load(pkl_file)
+
 #Start Message
 startMessage = visual.TextStim(myWin, pos=(0.0,-4), height =1, rgb=-1,
                                                                                         text="Please press left or right to indicate whether the line appears to the left or the right of the edge. Press any key when you are ready to continue.", )
@@ -109,62 +122,78 @@ myWin.flip()
 junk = event.waitKeys()
 
 #Jitter position of edges
-info['lumEdgePos'] = float(random.randrange(20, 80, 1))/float(100)
-print 'edge', info['lumEdgePos']
+info['markerPos'] = float(random.randrange(-30, 30, 1))/10
+print 'marker', info['markerPos']
 
 #For Loop to Run Through the Trials
 for thisDistance in stairs:
     trialClock.reset()
     
     print thisDistance
-    
-#    #Calculate the size of the gap in percentage terms
-#    gapPix = (misc.deg2pix(info['Gap'], monitor = myMon)*0.0512)
-#    gapDeg = info['Gap']/2
-    
+    info['lumEdgePos'] = (thisDistance)
+
     #Create stimuli
-
-    lum = colorFunctions.makeEdgeGauss(width=info['Blur'],center=info['lumEdgePos'])*0.3
-    lm=s= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*0.3
-#    s=colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*0.3
+    lum = colorFunctions.makeEdgeGauss(width=info['Blur'],center=info['lumEdgePos'])*info['Edge Contrast']
+    lm=s= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast']
     tex= colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s)
-
-#    noise1 = makeFilteredNoise(512, radius=info['Noise Size'])*info['Noise Contrast']
-#    lum += noise1
-#    noise2 = makeFilteredNoise(res=512, radius=info['Noise Size'])*info['Noise Contrast']
-#    lm += noise2
-#    noise3 = makeFilteredNoise(res=512, radius=info['Noise Size'])*info['Noise Contrast']
-#    s += noise3
-
-#    lumEdge= colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm*0, S=s*0, conversionMatrix = conversionMatrix)
-#    rgEdge = colorFunctions.dklCartToRGB_2d(LUM=lum*0, LM=lm, S=s*0, conversionMatrix = conversionMatrix)
-    sEdge = colorFunctions.dklCartToRGB_2d(LUM=lum*0, LM=lm*0, S=s, conversionMatrix = conversionMatrix)
-#    combEdge = colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s*0, conversionMatrix = conversionMatrix)
-#    sCombEdge = colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm*0, S=s, conversionMatrix = conversionMatrix)
+    
+    noise1 = (noise[random.randrange(0,99,1)])#*info['Noise Contrast']
+    print 'noise', len(noise1)
+    lum += noise1
+    noise2 = noise[random.randrange(0,99,1)]*info['Noise Contrast']
+    lm += noise2
+    noise3 = noise[random.randrange(0,99,1)]*info['Noise Contrast']
+    s += noise3
 
     #Draw stimuli
-#    combo = visual.PatchStim(myWin, tex = combEdge, size = 10.0, units = 'deg', sf=(1/10.0))
-#    scombo = visual.PatchStim(myWin, tex=sCombEdge, size = 10.0, units = 'deg', sf=(1/10.0))
-#    lum1 = visual.PatchStim(myWin, tex = lumEdge, size = 10.0, units = 'deg', sf=(1/10.0))
-#    rg1 = visual.PatchStim(myWin, tex = rgEdge, size = 10.0, units = 'deg', sf=(1/10.0))
-    s1 = visual.PatchStim(myWin, tex=sEdge, size=10.0, units='deg', sf=(1/10.0))
-
     if info['Channel']== 'Lum':
+        lumEdge= colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm*0, S=s*0, conversionMatrix = conversionMatrix)
+        if (np.max(lumEdge)>1.0) or (np.min(lumEdge)<-1.0):
+            print 'contrast outside range'
+            core.quit()
+        lum1 = visual.PatchStim(myWin, tex = lumEdge, size = 10.0, units = 'deg', sf=(1/10.0))
         lum1.draw()
     if info['Channel']=='LM':
+        rgEdge = colorFunctions.dklCartToRGB_2d(LUM=lum*0, LM=lm, S=s*0, conversionMatrix = conversionMatrix)
+        print np.max(rgEdge), np.min(rgEdge)
+        if (np.max(rgEdge)>1.0) or (np.min(rgEdge)<-1.0):
+            print 'contrast outside range'
+            core.quit()
+        rg1 = visual.PatchStim(myWin, tex = rgEdge, size = 10.0, units = 'deg', sf=(1/10.0))
         rg1.draw()
     if info['Channel']=='S':
+        sEdge = colorFunctions.dklCartToRGB_2d(LUM=lum*0, LM=lm*0, S=s, conversionMatrix = conversionMatrix)
+        if (np.max(sEdge)>1.0) or (np.min(sEdge)<-1.0):
+            print 'contrast outside range'
+            core.quit()
+        s1 = visual.PatchStim(myWin, tex=sEdge, size=10.0, units='deg', sf=(1/10.0))
         s1.draw()
     if info['Channel']=='LMCombo':
+        combEdge = colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s*0, conversionMatrix = conversionMatrix)
+        if (np.max(combEdge)>1.0) or (np.min(combEdge)<-1.0):
+            print 'contrast outside range'
+            core.quit()
+        combo = visual.PatchStim(myWin, tex = combEdge, size = 10.0, units = 'deg', sf=(1/10.0))
         combo.draw()
     if info['Channel']=='SCombo':
+        sCombEdge = colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm*0, S=s, conversionMatrix = conversionMatrix)
+        if (np.max(sCombEdge)>1.0) or (np.min(sCombEdge)<-1.0):
+            print 'contrast outside range'
+            core.quit()
+        scombo = visual.PatchStim(myWin, tex=sCombEdge, size = 10.0, units = 'deg', sf=(1/10.0))
         scombo.draw()
     
-    markerPos = -5+thisDistance
+    #Draw mask
+    upperMask = visual.ShapeStim(myWin, units='deg', lineColor=(0,0,0), fillColor=(0,0,0), 
+                            vertices=((-5,5), (5,5), (5,1), (-5,1)))
+    lowerMask = visual.ShapeStim(myWin, units='deg', lineColor=(0,0,0), fillColor=(0,0,0), 
+                            vertices=((-5,-5), (5,-5), (5,-1), (-5,-1)))
+    upperMask.draw()
+    lowerMask.draw()
     
     #Draw the marker
     marker = visual.ShapeStim(myWin, units = 'deg', lineWidth = 1.0, lineColor = 'black', fillColor = None,
-                        pos=(markerPos,-5), vertices = ((0, 0), (0, -1.0)), closeShape = False)
+                        pos=(info['markerPos'],-1), vertices = ((0, 0), (0, -1.0)), closeShape = False)
     marker.draw()
 
     myWin.flip()
@@ -183,11 +212,11 @@ for thisDistance in stairs:
     #myWin.getMovieFrame()
     #myWin.saveMovieFrames('test.jpg')
 
-print 'position', info['lumEdgePos']
+print 'position', info['markerPos']
 
 #Save stairs
-if not os.path.isdir('Synth_%s' %info['participant']):
-    os.mkdir('Synth_%s' %info['participant'])
-fName = 'Synth_%s//Synth_Gap%.2f_NoiseContrast%.2f_NoiseSize%.2f_Blur%.2f_%s_%s_%s' %(info['participant'], info['Gap'], info['Noise Contrast'], info['Noise Size'], info['Blur'], info['dateStr'], info['Channel'], info['participant'])
+if not os.path.isdir('SynthMov_%s' %info['participant']):
+    os.mkdir('SynthMov_%s' %info['participant'])
+fName = 'SynthMov_%s//SynthMov_Gap%.2f_NoiseContrast%.2f_NoiseSize%.2f_EdgeContrast%.2f_Blur%.2f_%s_%s_%s' %(info['participant'], info['Gap'], info['Noise Contrast'], info['Noise Size'], info['Edge Contrast'], info['Blur'], info['dateStr'], info['Channel'], info['participant'])
 stairs.saveAsPickle(fName)
 stairs.saveAsExcel(fileName=fName, sheetName='Raw Data', matrixOnly=False, appendFile=True)
