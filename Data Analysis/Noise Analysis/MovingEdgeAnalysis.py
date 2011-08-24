@@ -63,6 +63,7 @@ pylab.legend()
 combinedInten, combinedResp, combinedN = \
              data.functionFromStaircase(allIntensities, allResponses, bins = 'unique')
              
+print combinedN
 #print 'len', len(np.array(allIntensities[0]))#, 'Inten', allIntensities
 #print 'len', len(np.array(allResponses[0])), 'Resp', allResponses
 #

@@ -13,17 +13,21 @@
 #        matrix
        
 from psychopy import visual, filters, event
-import Image
+import Image, scipy
 import numpy as np
+from scipy.signal import convolve2d
 
+width = 0.5
 picture = np.array(Image.open('Leaf512.jpg').transpose(Image.FLIP_TOP_BOTTOM))/127.5-1
 
-tex = filters.makeGauss(picture, sd=0.1)
+gauss = filters.makeGauss(picture, mean=0, sd=width)/np.sqrt(2*np.pi*width**2)
+smth = scipy.signal.convolve2d(picture, gauss, 'same')
+
 
 myWin = visual.Window(size=(1024, 768), monitor = 'testMonitor', units = 'degs', 
         fullscr=False, allowGUI=True)
 
-img = visual.PatchStim(myWin, tex=tex, units='deg', sf=(1/10.0), size=10.0)
+img = visual.PatchStim(myWin, tex=smth, units='deg', sf=(1/10.0), size=10.0)
 img.draw()
 myWin.flip()
 event.waitKeys()

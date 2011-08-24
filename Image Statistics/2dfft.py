@@ -3,7 +3,7 @@
 #IF YOU DO NOT CHANGE THE DESTINATION FILE NAME, IT WILL OVER WRITE ANY
 #EXISTING FILE WITH THE SAME NAME
 
-from psychopy import colorFunctions, core, visual, event, data, gui
+from psychopy import misc, core, visual, event, data, gui
 from scipy import fftpack
 import scipy, Image, copy, pylab, glob
 import numpy as np
@@ -11,16 +11,16 @@ import radialProfile, radial_data
 from openpyxl.workbook import Workbook
 from openpyxl.writer.excel import ExcelWriter
 #
-#files = glob.glob('C:/Documents and Settings/lpxrs/My Documents/McGill Image Library/Animals/*.tif')
+files = glob.glob('C:\Documents and Settings\lpxrs\My Documents\Colour Data\Image Statistics\McGill Image Library/Textures/*.tif')
 #files = gui.fileOpenDlg('.', allowed = "JPEG files (*.jpg) | *.jpg")
-files = gui.fileOpenDlg('.', allowed = "TIFF files (*.tif) | *.tif")
+#files = gui.fileOpenDlg('.', allowed = "TIFF files (*.tif) | *.tif")
 if not files:
     core.quit()
 
 counter = 2
 
 #Name of file where data will be saved
-fName = "Animals.xlsx"
+fName = "Textures2.xlsx"
 
 #Create Excel File
 wb = Workbook()
@@ -50,7 +50,7 @@ for thisFileName in files:
     picture = np.array(OrigPicture.crop(box)) /127.5-1
 
 #Convert to DKL and separate into channels
-    dklPicture = colorFunctions.rgb2dklCart(picture, conversionMatrix=None)
+    dklPicture = misc.rgb2dklCart(picture, conversionMatrix=None)
     dklPicture = np.array(dklPicture)
 
     lum = copy.copy(dklPicture[:,:,0])
@@ -73,9 +73,9 @@ for thisFileName in files:
     F3S = abs(F2S)**2
 
     #Plotting kspace
-    pylab.figure(1)
-    pylab.clf()
-    pylab.imshow(np.log10(F3Lum))
+#    pylab.figure(1)
+#    pylab.clf()
+#    pylab.imshow(np.log10(F3Lum))
 
     #Calculating the azimuthally average 1D power spectrum using radialProfile
     A1Lum = radialProfile.azimuthalAverage(F3Lum)
@@ -83,45 +83,45 @@ for thisFileName in files:
     A1S = radialProfile.azimuthalAverage(F3S)
 
 #Plot radial Profile
-    pylab.figure(2)
-    pylab.clf()
-    pylab.semilogy(A1Lum, label = 'Lum')
-    pylab.semilogy(A1Lm, label = 'Lm')
-    pylab.semilogy(A1S, label = 'S')
-    pylab.title(OrigImage)
-    pylab.legend()
-    pylab.xlim(0, 256)
-    pylab.xlabel('Spatial Frequency')
-    pylab.ylabel('Power Spectrum')
-    
-    pylab.show()
+#    pylab.figure(2)
+#    pylab.clf()
+#    pylab.semilogy(A1Lum, label = 'Lum')
+#    pylab.semilogy(A1Lm, label = 'Lm')
+#    pylab.semilogy(A1S, label = 'S')
+#    pylab.title(OrigImage)
+#    pylab.legend()
+#    pylab.xlim(0, 256)
+#    pylab.xlabel('Spatial Frequency')
+#    pylab.ylabel('Power Spectrum')
+#    
+#    pylab.show()
 
     #Take mean of the last 128 points
-    LumMean = np.mean(A1Lum[127:])
-    LmMean = np.mean(A1Lm[127:])
-    SMean = np.mean(A1S[127:])
-    print LumMean
-    print LmMean
-    print SMean
+    LumMean = np.mean(A1Lum[127:256])
+    LmMean = np.mean(A1Lm[127:256])
+    SMean = np.mean(A1S[127:256])
+#    print LumMean
+#    print LmMean
+#    print SMean
 
     #Save Data to excel
-#    lumCell = 'A'+str(counter)
-#    lmCell = 'B'+str(counter)
-#    sCell = 'C'+str(counter)
-#     
-#     
-#    ws.cell(lumCell).value = LumMean
-#    ws.cell(lmCell).value = LmMean
-#    ws.cell(sCell).value = SMean
-#    
-#    counter +=1
-#
-#ws.cell('A1').value = 'Lum'
-#ws.cell('B1').value = 'Lm'
-#ws.cell('C1').value = 'S'
-#ew.save(filename = fName)
-#
-#print 'Your data has been saved to %s' %fName
+    lumCell = 'A'+str(counter)
+    lmCell = 'B'+str(counter)
+    sCell = 'C'+str(counter)
+     
+     
+    ws.cell(lumCell).value = LumMean
+    ws.cell(lmCell).value = LmMean
+    ws.cell(sCell).value = SMean
+    
+    counter +=1
+
+ws.cell('A1').value = 'Lum'
+ws.cell('B1').value = 'Lm'
+ws.cell('C1').value = 'S'
+ew.save(filename = fName)
+
+print 'Your data has been saved to %s' %fName
 
 
 

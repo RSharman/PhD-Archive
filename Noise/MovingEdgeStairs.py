@@ -13,7 +13,7 @@ from psychopy import visual, event, filters, monitors, data, sound, gui, misc, c
 import numpy as np
 import random, time, os, cPickle
 
-DEBUG=True
+DEBUG=False
 
 #Create a dialog box for settings and participant information
 try:
@@ -134,11 +134,11 @@ for thisDistance in stairs:
 
     #Create stimuli
     lum = colorFunctions.makeEdgeGauss(width=info['Blur'],center=info['lumEdgePos'])*info['Edge Contrast']
-    lm=s= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast']
+    lm= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast']
+    s= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast']
     tex= colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s)
     
-    noise1 = (noise[random.randrange(0,99,1)])#*info['Noise Contrast']
-    print 'noise', len(noise1)
+    noise1 = (noise[random.randrange(0,99,1)])*info['Noise Contrast']
     lum += noise1
     noise2 = noise[random.randrange(0,99,1)]*info['Noise Contrast']
     lm += noise2
@@ -168,21 +168,27 @@ for thisDistance in stairs:
             core.quit()
         s1 = visual.PatchStim(myWin, tex=sEdge, size=10.0, units='deg', sf=(1/10.0))
         s1.draw()
-    if info['Channel']=='LMCombo':
+    if info['Channel']=='LMLum':
         combEdge = colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s*0, conversionMatrix = conversionMatrix)
         if (np.max(combEdge)>1.0) or (np.min(combEdge)<-1.0):
             print 'contrast outside range'
             core.quit()
         combo = visual.PatchStim(myWin, tex = combEdge, size = 10.0, units = 'deg', sf=(1/10.0))
         combo.draw()
-    if info['Channel']=='SCombo':
+    if info['Channel']=='SLum':
         sCombEdge = colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm*0, S=s, conversionMatrix = conversionMatrix)
         if (np.max(sCombEdge)>1.0) or (np.min(sCombEdge)<-1.0):
             print 'contrast outside range'
             core.quit()
         scombo = visual.PatchStim(myWin, tex=sCombEdge, size = 10.0, units = 'deg', sf=(1/10.0))
         scombo.draw()
-    
+    if info['Channel']=='LMS':
+        LMSEdge = colorFunctions.dklCartToRGB_2d(LUM=lum*0, LM=lm, S=s, conversionMatrix = conversionMatrix)
+        if (np.max(LMSEdge)>1.0) or (np.min(LMSEdge)<-1.0):
+            print 'contrast outside range'
+            core.quit()
+        LMSCombo = visual.PatchStim(MyWin, tex=LMSEdge, size = 10.0, units = 'deg', sf=(1/10))
+        LMSCombo.draw()
     #Draw mask
     upperMask = visual.ShapeStim(myWin, units='deg', lineColor=(0,0,0), fillColor=(0,0,0), 
                             vertices=((-5,5), (5,5), (5,1), (-5,1)))

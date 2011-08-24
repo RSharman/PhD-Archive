@@ -1,6 +1,6 @@
 #Image statistics to analyse LM and S in natural images - February 2011
 
-from psychopy import colorFunctions
+from psychopy import misc
 import numpy as np
 import copy
 import Image
@@ -12,7 +12,7 @@ pictures = ["Leaf512.jpg", "Pansy512.jpg", "Pelican512.jpg", "Pumpkin512.jpg"]
 
 picture=np.array(Image.open("Pumpkin512.jpg").transpose(Image.FLIP_TOP_BOTTOM))/127.5-1
 
-dklPicture = colorFunctions.rgb2dklCart(picture)
+dklPicture = misc.rgb2dklCart(picture)
 dklPicture = np.array(dklPicture)
 
 lum = copy.copy(dklPicture[:,:,0])
