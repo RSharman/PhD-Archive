@@ -13,7 +13,7 @@ from psychopy import visual, event, filters, monitors, data, sound, gui, misc, c
 import numpy as np
 import random, time, os, cPickle
 
-DEBUG=False
+DEBUG=True
 
 #Create a dialog box for settings and participant information
 try:
@@ -21,11 +21,13 @@ try:
 except:
     info = {'participant' : 'RJS',
                 'Channel' : 'LM',
-                'Blur' : 0.1,
                 'Gap' : 0,
-                'Noise Size' : 0.1,
-                'Noise Contrast' : 0.2,
-                'Edge Contrast' : 0.3}
+                'Noise Contrast LM' : 0.2,
+                'Noise Contrast S' : 0.2,
+                'Noise Contrast Lum' : 0.2,
+                'Edge Contrast LM' : 0.3,
+                'Edge Contrast S' : 0.3,
+                'Edge Contrast Lum' : 0.3}
 info['dateStr']=time.strftime("%b%d_%H%M", time.localtime())
 dlg = gui.DlgFromDict(info, title='Synthetic Edge Experiment', fixed=['dateStr'])
 if dlg.OK:
@@ -64,6 +66,7 @@ if DEBUG==False:
 
 #Basic Settings
 info['displayT'] = 0.3
+info['Blur'] = 0.1
 
 #Function to Create Filtered White Noise
 #def makeFilteredNoise(res, radius, shape='gauss'):
@@ -101,9 +104,9 @@ stairs = data.StairHandler(startVal=info['startVal'],
                                                     maxVal=info['maxVal']
                                                     )
 
-if info['Edge Contrast'] + info['Noise Contrast'] >1.0:
-    print 'Edge Contrast + Noise Contrast > 1.0, please reduce one of these values'
-    core.quit()
+#if info['Edge Contrast'] + info['Noise Contrast'] >1.0:
+#    print 'Edge Contrast + Noise Contrast > 1.0, please reduce one of these values'
+#    core.quit()
 
 #noise=[]
 #for n in range(100):
@@ -133,16 +136,16 @@ for thisDistance in stairs:
     info['lumEdgePos'] = (thisDistance)
 
     #Create stimuli
-    lum = colorFunctions.makeEdgeGauss(width=info['Blur'],center=info['lumEdgePos'])*info['Edge Contrast']
-    lm= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast']
-    s= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast']
+    lum = colorFunctions.makeEdgeGauss(width=info['Blur'],center=info['lumEdgePos'])*info['Edge Contrast Lum']
+    lm= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast LM']
+    s= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast S']
     tex= colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s)
     
-    noise1 = (noise[random.randrange(0,99,1)])*info['Noise Contrast']
+    noise1 = (noise[random.randrange(0,99,1)])*info['Noise Contrast Lum']
     lum += noise1
-    noise2 = noise[random.randrange(0,99,1)]*info['Noise Contrast']
+    noise2 = noise[random.randrange(0,99,1)]*info['Noise Contrast LM']
     lm += noise2
-    noise3 = noise[random.randrange(0,99,1)]*info['Noise Contrast']
+    noise3 = noise[random.randrange(0,99,1)]*info['Noise Contrast S']
     s += noise3
 
     #Draw stimuli
@@ -187,7 +190,7 @@ for thisDistance in stairs:
         if (np.max(LMSEdge)>1.0) or (np.min(LMSEdge)<-1.0):
             print 'contrast outside range'
             core.quit()
-        LMSCombo = visual.PatchStim(MyWin, tex=LMSEdge, size = 10.0, units = 'deg', sf=(1/10))
+        LMSCombo = visual.PatchStim(myWin, tex=LMSEdge, size=10.0, units='deg', sf=(1/10.0))
         LMSCombo.draw()
     #Draw mask
     upperMask = visual.ShapeStim(myWin, units='deg', lineColor=(0,0,0), fillColor=(0,0,0), 
@@ -206,6 +209,9 @@ for thisDistance in stairs:
     core.wait(info['displayT'])
     tick.play()
     
+    myWin.getMovieFrame()
+    myWin.saveMovieFrames('test.jpg')
+    
     myWin.flip()
     
      #Take Participant Response
@@ -215,14 +221,13 @@ for thisDistance in stairs:
         thisResp = checkCorrect(keys)
     stairs.addData(thisResp)
 
-    #myWin.getMovieFrame()
-    #myWin.saveMovieFrames('test.jpg')
-
 print 'position', info['markerPos']
 
 #Save stairs
 if not os.path.isdir('SynthMov_%s' %info['participant']):
     os.mkdir('SynthMov_%s' %info['participant'])
-fName = 'SynthMov_%s//SynthMov_Gap%.2f_NoiseContrast%.2f_NoiseSize%.2f_EdgeContrast%.2f_Blur%.2f_%s_%s_%s' %(info['participant'], info['Gap'], info['Noise Contrast'], info['Noise Size'], info['Edge Contrast'], info['Blur'], info['dateStr'], info['Channel'], info['participant'])
+fName = 'SynthMov_%s//SynthMov_Gap%.2f_NContrLM%.2f_NContrS%.2f_NContrS%.2f_EContrLM%.2f_EContrS%.2f_EContrS%.2f_%s_%s_%s' %(info['participant'], info['Gap'], info['Noise Contrast LM'], \
+                info['Noise Contrast S'], info['Noise Contrast Lum'], info['Edge Contrast LM'], info['Edge Contrast S'], \
+                info['Edge Contrast Lum'], info['dateStr'], info['Channel'], info['participant'])
 stairs.saveAsPickle(fName)
 stairs.saveAsExcel(fileName=fName, sheetName='Raw Data', matrixOnly=False, appendFile=True)

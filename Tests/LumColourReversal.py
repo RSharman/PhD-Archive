@@ -1,7 +1,7 @@
 # Staircasing the chromatic blur of a natural scene to find the detection threshold - Oct 2010
 #All final RGB values are halved to ensure that they fall within -1-1. 
 
-from psychopy import visual, event, log, misc, colors, filters, misc, core, sound, data, gui, monitors, log, colorFunctions
+from psychopy import visual, event, log, misc, colors, filters, misc, core, sound, data, gui, monitors, log
 import numpy as np
 import pylab, scipy, copy, time, os, random
 from scipy import ndimage
@@ -27,11 +27,11 @@ else:
 #Create the basic information
 info['pictures'] = ["Pansy512.jpg", "Leaf512.jpg", "Pelican512.jpg", "Pumpkin512.jpg"]
 info['ISI'] = 0.5
-info['displayT'] = 0.5
+info['displayT'] = 0.3
 info['baseBlur'] = 0
 
 #Staircase Information
-info['nTrials'] = 5
+info['nTrials'] = 50
 info['nReversals'] = 1
 info['stepSizes'] = [8,8,4,4,2,2,1,1,0.5,0.5]
 info['minVal'] = 0
@@ -76,6 +76,14 @@ def checkCorrect (keys):
                 print "hit 1 or 2 (or q) (you hit %s)" %key
                 return None
 
+#Start Message
+startMessage = visual.TextStim(myWin, pos=(0.0,-4), height =1, rgb=-1,
+                                                                                        text="Please press 1 or 2 to indicate whether the first or second image appears more blurred. Press any key when you are ready to continue.", )
+                                                                                        
+startMessage.draw()
+myWin.flip()
+junk = event.waitKeys()
+
 #Create multiple staircases in order interleave them
 stairs = []
 dklPictures=[]
@@ -84,7 +92,7 @@ for thisPicture in info['pictures']:
     picture=np.array(Image.open(thisPicture).transpose(Image.FLIP_TOP_BOTTOM))/127.5-1
 
     #Change the picture from RGB to DKL
-    thisDklPicture = colorFunctions.rgb2dklCart(picture, conversionMatrix=conversionMatrix)
+    thisDklPicture = misc.rgb2dklCart(picture, conversionMatrix=conversionMatrix)
     thisDklPicture = np.array(thisDklPicture)
     
     #Create copies of the info for each staircase
@@ -126,22 +134,26 @@ for trialN in range(info['nTrials']):
         
 #        dklPicture = np.array(dklPicture)
 
-        lum = copy.copy(dklPicture[:,:,0])*info['Luminance']
-        lm = copy.copy(dklPicture[:,:,1])*info['Chromaticity']
-        s = copy.copy(dklPicture[:,:,2])*info['Chromaticity']
+#        lum = copy.copy(dklPicture[:,:,0])*info['Luminance']
+#        lm = copy.copy(dklPicture[:,:,1])*info['Chromaticity']
+#        s = copy.copy(dklPicture[:,:,2])*info['Chromaticity']
+        
+        lum = copy.copy(dklPicture[:,:,0])*info['Chromaticity']
+        lm = copy.copy(dklPicture[:,:,1])*info['Luminance']
+        s = copy.copy(dklPicture[:,:,2])*info['Luminance']
         
         sigmaLumFirst=0
         sigmaLumSecond=0
         sigmaFirst=0
         sigmaSecond=0
         
-        if info['Chromatic Blur']=='y':
+        if info['Luminance Blur']=='y':
             if order==1:
                 sigmaFirst += thisIntensity
             if order==2:
                 sigmaSecond += thisIntensity
             
-        if info['Luminance Blur']=='y':
+        if info['Chromatic Blur']=='y':
             if order==1:
                 sigmaLumFirst +=thisIntensity
             if order==2:
@@ -159,15 +171,15 @@ for trialN in range(info['nTrials']):
         lumSecond = ndimage.gaussian_filter(lum, sigma=sigmaLumSecond)
         
         #change back to RGB
-        rgbPictureFirst = colorFunctions.dklCartToRGB_2d(lumFirst*0, lumFirst, sFirst, conversionMatrix)
-        rgbPictureSecond = colorFunctions.dklCartToRGB_2d(lumSecond*0, lmSecond, lumSecond, conversionMatrix)
+        rgbPictureFirst = misc.dklCart2rgb((lmFirst+sFirst)/2, lumFirst, lumFirst, conversionMatrix)
+        rgbPictureSecond = misc.dklCart2rgb((lmSecond+sSecond)/2, lumSecond, lumSecond, conversionMatrix)
 
-#        rgbPictureFirst = colorFunctions.dklCartToRGB_2d(lumFirst, lmFirst, sFirst, conversionMatrix)
-#        rgbPictureSecond = colorFunctions.dklCartToRGB_2d(lumSecond, lmSecond, sSecond, conversionMatrix)
+#        rgbPictureFirst = misc.dklCart2rgb(lumFirst, lmFirst, sFirst, conversionMatrix)
+#        rgbPictureSecond = misc.dklCart2rgb(lumSecond, lmSecond, sSecond, conversionMatrix)
         
         #Divide all the values by 2 so that there is room for the increases caused by the Gaussian filter
-#        rgbPictureFirst=rgbPictureFirst/2
-#        rgbPictureSecond=rgbPictureSecond/2
+        rgbPictureFirst=rgbPictureFirst/2
+        rgbPictureSecond=rgbPictureSecond/2
                
     #    
         #Draw the picture
@@ -175,7 +187,7 @@ for trialN in range(info['nTrials']):
         imgFirst.draw()
         myWin.flip()
         core.wait(info['displayT'])
-        junk = event.waitKeys()
+#        junk = event.waitKeys()
         
         fixation.draw()
         myWin.flip()
@@ -185,7 +197,7 @@ for trialN in range(info['nTrials']):
         imgSecond.draw()
         myWin.flip()
         core.wait(info['displayT'])
-        junk = event.waitKeys()
+#        junk = event.waitKeys()
         
         if DEBUG==False: #Play a sound to indicate response is required
             tick.play()
@@ -223,15 +235,15 @@ if info['Chromatic Blur']=='y' and info['Luminance Blur']=='n':
 if info['Chromatic Blur']=='n' and info['Luminance Blur']=='y':
     blurInfo='LumBlur'
 
-if not os.path.isdir('Blur_%s' %info['participant']):
-    os.mkdir('Blur_%s' %info['participant'])
+if not os.path.isdir('ReverseBlur_%s' %info['participant']):
+    os.mkdir('ReverseBlur_%s' %info['participant'])
 #
 #log.console.setLevel(log.DEBUG)
 
 for thisStair in stairs:
     for p, d in thisStair.extraInfo.iteritems():
         Picture = p
-        fName = 'Blur_%s//Blur_%s_%s_%s_%s_%s' %(info['participant'], info['participant'], Picture, dispInfo, blurInfo, info['dateStr'])
+        fName = 'ReverseBlur_%s//ReverseBlur_%s_%s_%s_%s_%s' %(info['participant'], info['participant'], Picture, dispInfo, blurInfo, info['dateStr'])
     thisStair.saveAsExcel(fileName=fName, sheetName='RawData', matrixOnly = False, appendFile=True)
     thisStair.saveAsPickle(fName)
 
