@@ -47,7 +47,7 @@ nafc = 1
 constraints = ('unconstrained', 'unconstrained', 'unconstrained', 'Beta(2,20)')
 #constraints={'guess':'Uniform(0.01, 1.0)', 'lapse':'Beta(2,20)', 'a':'unconstrained', 'b':'unconstrained'}
 
-boots = psi.BootstrapInference(data, core='mw0.25', sigmoid='gauss', priors=constraints, nafc=1)
+boots = psi.BootstrapInference(data, core='ab', sigmoid='gauss', priors=constraints, nafc=1)
 #boots = psi.BootstrapInference(data, core='weibull', sigmoid='gumbel_l', priors=constraints, nafc=nafc)
 #
 #print boots.estimate
@@ -88,7 +88,7 @@ upperJndCI = meanJND + (1.96 * SE)
 lowerJndCI = meanJND - (1.96 * SE)
 
 print 'upper', upperJndCI, 'lower', lowerJndCI
-print 'std jnds', np.std(jnds)
+print 'std BETA', np.std(jnds)
 
 print 'alpha, beta, lapse', boots.estimate
 

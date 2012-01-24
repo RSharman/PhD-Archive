@@ -11,16 +11,16 @@ import radialProfile, radial_data
 from openpyxl.workbook import Workbook
 from openpyxl.writer.excel import ExcelWriter
 #
-files = glob.glob('C:\Documents and Settings\lpxrs\My Documents\Colour Data\Image Statistics\McGill Image Library/Textures/*.tif')
+#files = glob.glob('C:\Documents and Settings\lpxrs\My Documents\Colour Data\Image Statistics\McGill Image Library/Textures/*.tif')
 #files = gui.fileOpenDlg('.', allowed = "JPEG files (*.jpg) | *.jpg")
-#files = gui.fileOpenDlg('.', allowed = "TIFF files (*.tif) | *.tif")
+files = gui.fileOpenDlg('.', allowed = "TIFF files (*.tif) | *.tif")
 if not files:
     core.quit()
 
 counter = 2
 
 #Name of file where data will be saved
-fName = "Textures2.xlsx"
+#fName = "Textures2.xlsx"
 
 #Create Excel File
 wb = Workbook()
@@ -94,34 +94,42 @@ for thisFileName in files:
 #    pylab.xlabel('Spatial Frequency')
 #    pylab.ylabel('Power Spectrum')
 #    
-#    pylab.show()
+    pylab.figure(2)
+    pylab.clf()
+    
+    pylab.loglog(A1Lum, label = 'lum')
+    pylab.loglog(A1Lm, label = 'lm')
+    pylab.loglog(A1S, label = 's')
+    pylab.legend()
+    
+    pylab.show()
 
     #Take mean of the last 128 points
     LumMean = np.mean(A1Lum[127:256])
     LmMean = np.mean(A1Lm[127:256])
     SMean = np.mean(A1S[127:256])
-#    print LumMean
-#    print LmMean
-#    print SMean
+    print LumMean
+    print LmMean
+    print SMean
 
     #Save Data to excel
-    lumCell = 'A'+str(counter)
-    lmCell = 'B'+str(counter)
-    sCell = 'C'+str(counter)
-     
-     
-    ws.cell(lumCell).value = LumMean
-    ws.cell(lmCell).value = LmMean
-    ws.cell(sCell).value = SMean
-    
-    counter +=1
-
-ws.cell('A1').value = 'Lum'
-ws.cell('B1').value = 'Lm'
-ws.cell('C1').value = 'S'
-ew.save(filename = fName)
-
-print 'Your data has been saved to %s' %fName
+#    lumCell = 'A'+str(counter)
+#    lmCell = 'B'+str(counter)
+#    sCell = 'C'+str(counter)
+#     
+#     
+#    ws.cell(lumCell).value = LumMean
+#    ws.cell(lmCell).value = LmMean
+#    ws.cell(sCell).value = SMean
+#    
+#    counter +=1
+#
+#ws.cell('A1').value = 'Lum'
+#ws.cell('B1').value = 'Lm'
+#ws.cell('C1').value = 'S'
+#ew.save(filename = fName)
+#
+#print 'Your data has been saved to %s' %fName
 
 
 

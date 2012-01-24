@@ -107,7 +107,7 @@ pylab.title('pse = %0.3f' %(threshComb))
 combinedInten-=100
 #plot points
 maxN=max(combinedN); minN=min(combinedN)
-print len(combinedN)
+#print len(combinedN)
 maxMarker=8.0; minMarker=4.0
 for pointN in range(len(combinedInten)):
     thisN = combinedN[pointN]
