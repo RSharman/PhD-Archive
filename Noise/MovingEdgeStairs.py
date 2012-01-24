@@ -13,7 +13,7 @@ from psychopy import visual, event, filters, monitors, data, sound, gui, misc, c
 import numpy as np
 import random, time, os, cPickle
 
-DEBUG=True
+DEBUG=False
 
 #Create a dialog box for settings and participant information
 try:
@@ -58,7 +58,7 @@ if DEBUG==True:
     import colorFunctions
     
 if DEBUG==False:
-    myWin = visual.Window(size=(1024, 768), monitor = 'hawk', units = 'deg',
+    myWin = visual.Window(size=(1280, 1024), monitor = 'hawk', units = 'deg',
         fullscr=True, allowGUI=False, bitsMode = None)
     myMon=monitors.Monitor('hawk')
     conversionMatrix = myMon.getDKL_RGB(RECOMPUTE=False)
@@ -209,9 +209,6 @@ for thisDistance in stairs:
     core.wait(info['displayT'])
     tick.play()
     
-    myWin.getMovieFrame()
-    myWin.saveMovieFrames('test.jpg')
-    
     myWin.flip()
     
      #Take Participant Response
@@ -220,6 +217,9 @@ for thisDistance in stairs:
         keys = event.waitKeys()
         thisResp = checkCorrect(keys)
     stairs.addData(thisResp)
+
+    #myWin.getMovieFrame()
+    #myWin.saveMovieFrames('test.jpg')
 
 print 'position', info['markerPos']
 
