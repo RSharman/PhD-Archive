@@ -75,13 +75,15 @@ print 'jnd', (boots.getThres(0.75)-boots.getThres(0.25))
 
 estimates = boots.mcestimates
 jnds = []
+threshs = []
 
 for n in range(len(estimates)):
     temp = estimates[n]
     jnds.append(temp[1])
+    threshs.append(temp[0])
 
 meanJND = np.mean(jnds)
-print 'mean', meanJND, 'median', np.median(jnds), 'mode', stats.mode(jnds)
+#print 'mean', meanJND, 'median', np.median(jnds), 'mode', stats.mode(jnds)
 SE = (np.std(jnds))/(np.sqrt(len(jnds)))
 
 upperJndCI = meanJND + (1.96 * SE)
@@ -89,6 +91,7 @@ lowerJndCI = meanJND - (1.96 * SE)
 
 print 'upper', upperJndCI, 'lower', lowerJndCI
 print 'std BETA', np.std(jnds)
+print 'std PSE', np.std(threshs)
 
 print 'alpha, beta, lapse', boots.estimate
 

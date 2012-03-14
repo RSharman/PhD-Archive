@@ -6,7 +6,7 @@ matplotlib.use('WXAgg')
 import pylab, scipy, numpy, csv
 import numpy as np
 
-fontsize = 16
+fontsize = 30
 
 #Blur Data
 AchromThresh = [0.844, 1.673, 0.768, 0.896, 1.46, 0.501, 0.913, 0.639, 0.519, 0.498, 0.433, 0.494, 0.489, 0.469, 0.787, 0.694, 1.442, 1.294, 2.259, 1.845]
@@ -46,16 +46,16 @@ conditions = [1, 2, 3, 4]
 labels = ["Luminance Blur", "Chromatic Blur"]
 
 #Blur Data
-#loneMeans = [0.94585, 5.86545]
-#comboMeans = [1.00675, 12.38235]
-#loneStandardErrors = [0.116250102688, 0.625416974806]
-#comboStandardErrors = [0.12711785624, 1.43284851131]
+loneMeans = [0.94585, 5.86545]
+comboMeans = [1.00675, 12.38235]
+loneStandardErrors = [0.116250102688, 0.625416974806]
+comboStandardErrors = [0.12711785624, 1.43284851131]
 
 #Blur Thresh Data
-loneMeans = [1.4368, 7.1926]
-comboMeans = [1.6320, 14.4794]
-loneStandardErrors = [0.11036, 0.79632]
-comboStandardErrors = [0.12988, 1.99703]
+#loneMeans = [1.4368, 7.1926]
+#comboMeans = [1.6320, 14.4794]
+#loneStandardErrors = [0.11036, 0.79632]
+#comboStandardErrors = [0.12988, 1.99703]
 
 pylab.figure(1, (11,8))
 xLoneLocations = [0.5, 2.0]
@@ -65,8 +65,11 @@ xwidth = 0.5
 ticks = [1.0, 2.5]
 yticks = [5.0, 10.0, 15.0, 20.0]
 
-lone = pylab.bar(xLoneLocations, loneMeans, facecolor = '#0032ff', facealpha = 0.2, edgecolor = 'Black', width = xwidth, bottom =0, yerr=loneStandardErrors, ecolor = 'Black')
-combo = pylab.bar(xComboLocations, comboMeans, facecolor = '#0132fa', facealpha = 0.82, width = xwidth, bottom =0, yerr=comboStandardErrors, ecolor = 'Black')
+#lone = pylab.bar(xLoneLocations, loneMeans, facecolor = '#0032ff', facealpha = 0.2, edgecolor = 'Black', width = xwidth, bottom =0, yerr=loneStandardErrors, ecolor = 'Black')
+#combo = pylab.bar(xComboLocations, comboMeans, facecolor = '#0132fa', facealpha = 0.82, width = xwidth, bottom =0, yerr=comboStandardErrors, ecolor = 'Black')
+
+lone = pylab.bar(xLoneLocations, loneMeans, facecolor = '#DCDCDC', edgecolor = 'Black', width = xwidth, bottom =0, yerr=loneStandardErrors, ecolor = 'Black')
+combo = pylab.bar(xComboLocations, comboMeans, facecolor = '#7F7F7F', width = xwidth, bottom =0, yerr=comboStandardErrors, ecolor = 'Black')
 pylab.xlim([0, 3.5])
 pylab.xticks(ticks, labels)
 pylab.yticks(yticks, yticks)

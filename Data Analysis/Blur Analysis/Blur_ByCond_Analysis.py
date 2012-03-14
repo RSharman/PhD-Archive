@@ -51,8 +51,8 @@ for thisFileName in files:
         print 'Threshold', Threshold
         
 #        observer = str(thisFileName[72])+str(thisFileName[73])+str(thisFileName[74])
-#        observer = str(thisFileName[-10])+str(thisFileName[-9])+str(thisFileName[-8])
-        observer = thisIndDat.extraInfo["participant"]
+        observer = str(thisFileName[-6])+str(thisFileName[-5])
+#        observer = thisIndDat.extraInfo["participant"]
         
         label = ("%.2f - " %Threshold) + observer
         
