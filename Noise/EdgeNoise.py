@@ -1,15 +1,16 @@
 #Create edge stimuli with controlled gap, noise and blur - April 2011
 
-from psychopy import visual, event, filters, colorFunctions, monitors
+from psychopy import visual, event, filters, monitors
 import numpy as np
 import random
+import colorFunctions
 
 DEBUG=True
 
 #Settings
 blur = 0.075
 gap = 0.06
-noiseSize = 0.1
+noiseSize = 0.5
 noiseContrast = 0
 
 
@@ -37,6 +38,8 @@ lum = colorFunctions.makeEdgeGauss(width=blur,center=0.5)*0.3
 lm= colorFunctions.makeEdgeGauss(width=blur,center=(0.5+gap))*0.3
 s=colorFunctions.makeEdgeGauss(width=0.2,center=0.5)*0.0
 tex= colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s)
+
+noiseContrast = 1.0
 
 noise1 = makeFilteredNoise(512, radius=noiseSize)*noiseContrast
 lum += noise1

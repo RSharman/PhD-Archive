@@ -6,9 +6,11 @@
 #on the right
 #
 
-from psychopy import data, gui, misc, core
+from psychopy import data, gui, misc, core, logging
 import pylab, scipy
 import numpy as np
+import cPickle
+import pickle
 
 files = gui.fileOpenDlg('.')
 if not files:
@@ -55,7 +57,7 @@ for fileN, thisStair in enumerate(allIntensities):
     #names = files[fileN]
     label = files[fileN]
     pylab.plot(thisStair, label=label[-21:])
-pylab.legend()
+#pylab.legend()
 #pylab.ylim(0.5,-0.5)
 
 

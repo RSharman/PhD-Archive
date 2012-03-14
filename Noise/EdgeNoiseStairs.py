@@ -17,7 +17,7 @@ DEBUG=True
 
 #Create a dialog box for settings and participant information
 try:
-    info=misc.fromFile('lastParams.pickle')
+    info=misc.fromFile('edgeParams.pickle')
 except:
     info = {'participant' : 'RJS',
                 'Channel' : 'LM',
