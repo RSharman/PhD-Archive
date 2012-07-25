@@ -74,23 +74,35 @@ print 'slope', boots.getSlope()
 print 'jnd', (boots.getThres(0.75)-boots.getThres(0.25))
 
 estimates = boots.mcestimates
-jnds = []
+betas = []
 threshs = []
 
 for n in range(len(estimates)):
     temp = estimates[n]
-    jnds.append(temp[1])
+    betas.append(temp[1])
     threshs.append(temp[0])
 
-meanJND = np.mean(jnds)
+meanBeta = np.mean(betas)
 #print 'mean', meanJND, 'median', np.median(jnds), 'mode', stats.mode(jnds)
-SE = (np.std(jnds))/(np.sqrt(len(jnds)))
+SE = (np.std(betas))/(np.sqrt(len(betas)))
 
-upperJndCI = meanJND + (1.96 * SE)
-lowerJndCI = meanJND - (1.96 * SE)
+#upperBetaCI = meanBeta + (1.96 * SE)
+#lowerBetaCI = meanBeta - (1.96 * SE)
+#
+#print 'upper', upperBetaCI, 'lower', lowerBetaCI
 
-print 'upper', upperJndCI, 'lower', lowerJndCI
-print 'std BETA', np.std(jnds)
+sortedBetas = copy.copy(betas)
+sortedBetas = sort(sortedBetas)
+
+lowindex=int(0.025*nBoots)
+hiindex=int(0.975*nBoots)
+low95=sortedBetas[lowindex]
+hi95=sortedBetas[hiindex]
+
+print 'upper', hi95
+print 'lower', low95
+
+print 'std BETA', np.std(betas)
 print 'std PSE', np.std(threshs)
 
 print 'alpha, beta, lapse', boots.estimate
