@@ -26,7 +26,7 @@ else:
     core.quit()
     
 #Create the basic information
-info['pictures'] = ["Pumpkin512.jpg"]
+info['pictures'] = ["Pelican512.jpg"]
 info['ISI'] = 0.5
 info['displayT'] = 0.5
 info['baseBlur'] = 0
@@ -37,7 +37,7 @@ info['nReversals'] = 1
 info['stepSizes'] = [8,8,4,4,2,2,1,1,0.5,0.5]
 info['minVal'] = 0
 info['maxVal'] = 100
-info['startVal'] = 16
+info['startVal'] = 0
 info['nUp'] = 1
 info['nDown'] = 3
 
@@ -184,8 +184,8 @@ for trialN in range(info['nTrials']):
         imgSecond.draw()
         myWin.flip()
         core.wait(info['displayT'])
-#        myWin.getMovieFrame()
-#        myWin.saveMovieFrames('Blur2.jpg')
+        myWin.getMovieFrame()
+        myWin.saveMovieFrames('PansyScreenCapture.jpg')
         
         if DEBUG==False: #Play a sound to indicate response is required
             tick.play()

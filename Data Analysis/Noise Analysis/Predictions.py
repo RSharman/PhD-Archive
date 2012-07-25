@@ -1,8 +1,8 @@
 import numpy as np
 
-lum = 0.009717
-lm = 0.009509
-s = 0.01641
+lum = 0.02061
+lm = 0.03602
+s = 0.07776
 
 lm = (lm/(np.sqrt(2)))**2
 s = (s/(np.sqrt(2)))**2

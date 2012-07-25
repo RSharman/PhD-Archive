@@ -7,7 +7,7 @@
 #on the right
 #It also plots the individual curves for each image.
 
-from psychopy import data, gui, misc, core
+from psychopy import data, gui, misc, core, compatibility
 import matplotlib
 matplotlib.use('WXAgg')
 import pylab, scipy, numpy
@@ -21,7 +21,7 @@ indIntensities={}
 indResponses={}
 
 for thisFileName in files:
-    thisIndDat = misc.fromFile(thisFileName)
+    thisIndDat = compatibility.fromFile(thisFileName)
     
     print dir(thisIndDat)
     
@@ -65,7 +65,7 @@ for thisFileName in files:
 #get the combined data from all the files
 allIntensities, allResponses = [],[]
 for thisFileName in files:
-    thisDat = misc.fromFile(thisFileName)
+    thisDat = compatibility.fromFile(thisFileName)
     assert isinstance(thisDat, data.StairHandler)
     allIntensities.append( thisDat.intensities )
     allResponses.append( thisDat.data )

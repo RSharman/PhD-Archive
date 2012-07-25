@@ -15,11 +15,11 @@ import random, time, os, cPickle
 
 from numpy.random import shuffle
 
-DEBUG=False
+DEBUG=True
 
 #Create a dialog box for settings and participant information
 try:
-    info=misc.fromFile('lastParams.pickle')
+    info=misc.fromFile('movlastParams.pickle')
 except:
     info = {'participant' : 'RJS',
 #                'Channel' : 'LM',
@@ -34,7 +34,7 @@ except:
 info['dateStr']=time.strftime("%b%d_%H%M", time.localtime())
 dlg = gui.DlgFromDict(info, title='Synthetic Edge Experiment', fixed=['dateStr'])
 if dlg.OK:
-    misc.toFile('lastParams.pickle', info)
+    misc.toFile('movlastParams.pickle', info)
 else:
     core.quit()
 

@@ -7,7 +7,7 @@
 #on the right
 #It also plots the individual curves for each image.
 
-from psychopy import data, gui, misc, core
+from psychopy import data, gui, misc, core, compatibility
 import matplotlib
 matplotlib.use('WXAgg')
 import pylab, scipy, numpy
@@ -21,7 +21,7 @@ indIntensities={}
 indResponses={}
 
 for thisFileName in files:
-    thisIndDat = misc.fromFile(thisFileName)
+    thisIndDat = compatibility.fromFile(thisFileName)
     for imageName, array in thisIndDat.extraInfo.iteritems():
         thisImageName = imageName
         indIntensities[thisImageName]=[]
