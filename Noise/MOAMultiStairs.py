@@ -41,31 +41,33 @@ if DEBUG==True:
         fullscr=False, allowGUI=True, bitsMode=None)
     myMon = monitors.Monitor('testMonitor')
     conversionMatrix = None
-    edgeSize = 4.5#10.0
-    edgeSF = 1/4.5#1.0/10.0
+    edgeSize = 10.0
+    edgeSF = 1.0/10.0
     import colorFunctions
     
 if DEBUG==False:
-    myWin = visual.Window(size=(1024, 768), monitor = 'heron', units = 'deg', screen=1,
+    myWin = visual.Window(size=(1024, 768), monitor = 'heron', units = 'deg',
         fullscr=True, allowGUI=False, bitsMode = 'fast')
     myMon=monitors.Monitor('heron')
     conversionMatrix = myMon.getDKL_RGB(RECOMPUTE=False)
-    edgeSize = 4.5
-    edgeSF = 1.0/4.5
+    edgeSize = 10.0
+    edgeSF = 1.0/10.0
     import colorFunctions
 
 #Basic Settings
-info['Blur'] = 0.03
+info['Blur'] = 0.01
 info['ISI'] = 0.3
+repeats = 2
 myMouse = event.Mouse(win = myWin)
 finalPositions={}
 markerPositions={}
 
 #Setting for Trial Handler
 stimList = data.importConditions('MOAConds.xlsx')
-trials = data.TrialHandler(stimList, 2)
+trials = data.TrialHandler(trialList=stimList, nReps=repeats, extraInfo=info)
 trials.data.addDataType('LumEdge')
 trials.data.addDataType('Marker')
+#trials.data.addDataType('Condition')
 
 #Checking Responses
 def checkCorrect (keys):
@@ -81,31 +83,39 @@ def checkCorrect (keys):
                 print "hit left or right (or q) (you hit %s)" %key
                 return None
 
-Conds = ['Lum', 'LMLum', 'SLum']
-# ['LM', 'S', 'Lum', 'LMLum', 'SLum', 'LMS']
-shuffle(Conds)
+#Create stimuli
+lum = colorFunctions.makeEdgeGauss(width=info['Blur'],center=0.5, size=512)*info['Edge Contrast Lum']
+lm= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(0.5+info['Gap']), size=512)*info['Edge Contrast LM']
+s= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(0.5+info['Gap']), size=512)*info['Edge Contrast S']
+tex= colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s)
+edgePos = 0.0
 
-print Conds
+#Start Message
+startMessage = visual.TextStim(myWin, pos=(0.0,-0.6), height =0.3, colorSpace = 'rgb', color=-1, wrapWidth=4.0,
+                                                                                        text="Please press click and hold the left mouse button the align the marker and edge, when you are happy right click to move onto the next trial. Press any key when you are ready to continue.", )
+                                                                                        
+startMessage.draw()
+myWin.flip()
+junk = event.waitKeys()
 
 #for thisCond in Conds:
 for thisTrial in trials:
     info['Channel']=thisTrial['condList']
-    #Start Message
-    startMessage = visual.TextStim(myWin, pos=(0.0,-0.6), height =0.3, colorSpace = 'rgb', color=-1, wrapWidth=4.0,
-                                                                                            text="Please press click and hold the left mouse button the align the marker and edge, when you are happy right click to move onto the next trial. Press any key when you are ready to continue.", )
-                                                                                            
-    startMessage.draw()
-    myWin.flip()
-    junk = event.waitKeys()
+    print info['Channel']
 
     #Jitter position of edges
     info['markerPos'] = float(random.randrange(-10, 10, 1))/10
     print 'marker', info['markerPos']
-    info['lumEdgePos'] = 0.5
+    
+    myWin.flip()
 
 #    Reset mouse and clock
+    event.clearEvents()
     myMouse.clickReset()
     trialClock.reset()
+    myWin.flip()
+    core.wait(info['ISI'])
+    edgePos = 0.0
     
     while True:
         for key in event.getKeys():
@@ -120,27 +130,22 @@ for thisTrial in trials:
             trials.data.add('Condition', info['Channel'])
             trials.data.add('LumEdge', finalPosition)
             trials.data.add('Marker', info['markerPos'])
+            myWin.flip()
 
             print 'tada', finalPosition
             break
 
         #Changing lumEdgePos with mousePos
         if (mouse1):
-            info['lumEdgePos'] += mouse_dX/25
-        
-        #Create stimuli
-        lum = colorFunctions.makeEdgeGauss(width=info['Blur'],center=info['lumEdgePos'])*info['Edge Contrast Lum']
-        lm= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast LM']
-        s= colorFunctions.makeEdgeGauss(width=info['Blur'],center=(info['lumEdgePos']+info['Gap']))*info['Edge Contrast S']
-        tex= colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s)
-        
+            edgePos += mouse_dX
+
         #Draw stimuli
         if info['Channel']== 'Lum':
             lumEdge= colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm*0, S=s*0, conversionMatrix = conversionMatrix)
             if (np.max(lumEdge)>1.0) or (np.min(lumEdge)<-1.0):
                 print 'contrast outside range'
                 core.quit()
-            lum1 = visual.PatchStim(myWin, tex = lumEdge, size = edgeSize, units = 'deg', sf=(edgeSF))
+            lum1 = visual.PatchStim(myWin, tex = lumEdge, size=edgeSize, units = 'deg', sf=edgeSF, pos=(edgePos, 0.0))
             lum1.draw()
         if info['Channel']=='LM':
             rgEdge = colorFunctions.dklCartToRGB_2d(LUM=lum*0, LM=lm, S=s*0, conversionMatrix = conversionMatrix)
@@ -148,43 +153,49 @@ for thisTrial in trials:
             if (np.max(rgEdge)>1.0) or (np.min(rgEdge)<-1.0):
                 print 'contrast outside range'
                 core.quit()
-            rg1 = visual.PatchStim(myWin, tex = rgEdge, size = edgeSize, units = 'deg', sf=(edgeSF))
+            rg1 = visual.PatchStim(myWin, tex = rgEdge, size = edgeSize, units = 'deg', sf=(edgeSF), pos=(edgePos, 0.0))
             rg1.draw()
         if info['Channel']=='S':
             sEdge = colorFunctions.dklCartToRGB_2d(LUM=lum*0, LM=lm*0, S=s, conversionMatrix = conversionMatrix)
             if (np.max(sEdge)>1.0) or (np.min(sEdge)<-1.0):
                 print 'contrast outside range'
                 core.quit()
-            s1 = visual.PatchStim(myWin, tex=sEdge, size=edgeSize, units='deg', sf=(edgeSF))
+            s1 = visual.PatchStim(myWin, tex=sEdge, size=edgeSize, units='deg', sf=(edgeSF), pos=(edgePos, 0.0))
             s1.draw()
         if info['Channel']=='LMLum':
             combEdge = colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm, S=s*0, conversionMatrix = conversionMatrix)
             if (np.max(combEdge)>1.0) or (np.min(combEdge)<-1.0):
                 print 'contrast outside range'
                 core.quit()
-            combo = visual.PatchStim(myWin, tex = combEdge, size = edgeSize, units = 'deg', sf=(edgeSF))
+            combo = visual.PatchStim(myWin, tex = combEdge, size = edgeSize, units = 'deg', sf=(edgeSF), pos=(edgePos, 0.0))
             combo.draw()
         if info['Channel']=='SLum':
             sCombEdge = colorFunctions.dklCartToRGB_2d(LUM=lum, LM=lm*0, S=s, conversionMatrix = conversionMatrix)
             if (np.max(sCombEdge)>1.0) or (np.min(sCombEdge)<-1.0):
                 print 'contrast outside range'
                 core.quit()
-            scombo = visual.PatchStim(myWin, tex=sCombEdge, size = edgeSize, units = 'deg', sf=(edgeSF))
+            scombo = visual.PatchStim(myWin, tex=sCombEdge, size = edgeSize, units = 'deg', sf=(edgeSF), pos=(edgePos, 0.0))
             scombo.draw()
         if info['Channel']=='LMS':
             LMSEdge = colorFunctions.dklCartToRGB_2d(LUM=lum*0, LM=lm, S=s, conversionMatrix = conversionMatrix)
             if (np.max(LMSEdge)>1.0) or (np.min(LMSEdge)<-1.0):
                 print 'contrast outside range'
                 core.quit()
-            LMSCombo = visual.PatchStim(myWin, tex=LMSEdge, size=edgeSize, units='deg', sf=(edgeSF))
+            LMSCombo = visual.PatchStim(myWin, tex=LMSEdge, size=edgeSize, units='deg', sf=(edgeSF), pos=(edgePos, 0.0))
             LMSCombo.draw()
         #Draw mask
         upperMask = visual.ShapeStim(myWin, units='deg', lineColor=(0,0,0), fillColor=(0,0,0), 
-                                vertices=((-5,5), (5,5), (5,0.5), (-5,0.5)))
+                                vertices=((-10,5), (10,5), (10,0.5), (-10,0.5)))
         lowerMask = visual.ShapeStim(myWin, units='deg', lineColor=(0,0,0), fillColor=(0,0,0), 
-                                vertices=((-5,-5), (5,-5), (5,-0.5), (-5,-0.5)))
+                                vertices=((-10,-5), (10,-5), (10,-0.5), (-10,-0.5)))
+        leftMask = visual.ShapeStim(myWin, units='deg', lineColor=(0,0,0), fillColor=(0,0,0),
+                                vertices=((-10,-5), (-2, -5), (-2,5), (-10, 5)))
+        rightMask = visual.ShapeStim(myWin, units='deg', lineColor=(0,0,0), fillColor=(0,0,0),
+                                vertices=((2, -5), (10, -5), (10, 5), (2, 5)))
         upperMask.draw()
         lowerMask.draw()
+        leftMask.draw()
+        rightMask.draw()
         
         #Draw the marker
         marker = visual.ShapeStim(myWin, units = 'deg', lineWidth = 1.0, lineColor = 'black', fillColor = None,
@@ -197,7 +208,7 @@ for thisTrial in trials:
         
          #Take Participant Response
         if (mouse1):
-            finalPosition = info['lumEdgePos']
+            finalPosition = edgePos
 #            print 'lumEdge', finalPosition
 #            print 'line up', ((info['markerPos']+1)/2)-finalPosition
 #            print 'marker', info['markerPos']
@@ -205,7 +216,7 @@ for thisTrial in trials:
 #Save Data
 if not os.path.isdir('MOA_%s' %info['participant']):
     os.mkdir('MOA_%s' %info['participant'])
-fileName = 'MOA_%s//MOALong_Gap%.2f_EContrLM%.2f_EContrS%.2f_EContrS%.2f_%s_%s.pickle' %(info['participant'], info['Gap'],\
+fileName = 'MOA_%s//MOALong_Gap%.2f_EContrLM%.2f_EContrS%.2f_EContrS%.2f_%s_%s' %(info['participant'], info['Gap'],\
                     info['Edge Contrast LM'], info['Edge Contrast S'], info['Edge Contrast Lum'], info['dateStr'], info['participant']) 
 
 trials.saveAsExcel(fileName=fileName, sheetName='rawData', stimOut = ['condList'], dataOut = ('n', 'all_mean', 'all_std', 'all_raw'))
